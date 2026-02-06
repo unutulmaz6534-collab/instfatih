@@ -7,196 +7,113 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
 body{background:#000;color:#fff}
-
-/* HEADER */
 header{text-align:center;padding:15px;font-size:24px;border-bottom:1px solid #222}
-
-/* STORIES */
 .stories{display:flex;gap:12px;padding:10px;overflow-x:auto}
-.story{text-align:center}
-.story img{
-  width:70px;height:70px;border-radius:50%;
-  border:3px solid #ff0050;object-fit:cover
-}
-
-/* POST */
+.story img{width:70px;height:70px;border-radius:50%;border:3px solid #ff0050}
 .post{padding:10px;border-bottom:1px solid #222}
 .post img{width:100%;border-radius:10px}
-.actions{display:flex;gap:15px;font-size:22px;margin:8px 0}
+.actions{display:flex;gap:15px;font-size:22px;margin:6px 0}
 .like{cursor:pointer}
 .like.active{color:red}
-
-/* NAV */
-nav{
-  position:fixed;bottom:0;width:100%;
-  background:#000;border-top:1px solid #222;
-  display:flex;justify-content:space-around;
-  padding:10px;font-size:22px
-}
-nav span{cursor:pointer}
-
-/* MODALS */
-.modal{
-  position:fixed;inset:0;background:#000;
-  display:none;justify-content:center;
-  align-items:center;z-index:9999
-}
-.modal img{width:100%;height:100%;object-fit:contain}
-.close{position:absolute;top:20px;right:20px;font-size:28px}
-
-/* COMMENT */
-#commentBox{
-  position:fixed;bottom:0;width:100%;
-  background:#111;padding:10px;display:none
-}
-#commentBox input{width:80%;padding:8px}
-#commentBox button{padding:8px}
-
-/* PROFILE */
-#profile{
-  display:none;padding:20px;text-align:center
-}
-#profile img{width:100px;height:100px;border-radius:50%}
-
-/* ADD POST */
-#addPost{
-  display:none;padding:20px
-}
+.likes{font-size:14px;color:#ccc}
+.delete{color:#f55;font-size:14px;cursor:pointer}
+nav{position:fixed;bottom:0;width:100%;background:#000;border-top:1px solid #222;
+display:flex;justify-content:space-around;padding:10px;font-size:22px}
+#addPost{display:none;padding:15px}
+#addPost input{width:100%;padding:10px;margin-bottom:10px}
+#profile{display:none;text-align:center;padding:20px}
 </style>
 </head>
 <body>
 
 <header>📸 InstFatih</header>
 
-<!-- STORIES -->
 <div class="stories">
-  <div class="story" onclick="openStory(0)">
-    <img src="https://picsum.photos/100?1"><small>fatih</small>
-  </div>
-  <div class="story" onclick="openStory(1)">
-    <img src="https://picsum.photos/100?2"><small>ali</small>
-  </div>
-  <div class="story" onclick="openStory(2)">
-    <img src="https://picsum.photos/100?3"><small>ayşe</small>
-  </div>
+  <div class="story"><img src="https://picsum.photos/100?1"></div>
+  <div class="story"><img src="https://picsum.photos/100?2"></div>
+  <div class="story"><img src="https://picsum.photos/100?3"></div>
 </div>
 
-<!-- FEED -->
-<div id="feed">
-  <div class="post">
-    <img src="https://picsum.photos/600/600?4">
-    <div class="actions">
-      <span class="like" onclick="like(this)">❤</span>
-      <span onclick="openComment()">💬</span>
-    </div>
-    <p>İlk gönderim 🚀</p>
-  </div>
-</div>
+<div id="feed"></div>
 
-<!-- PROFILE -->
-<div id="profile">
-  <img src="https://picsum.photos/200">
-  <h2>fatih</h2>
-  <p>Gönderi: 1 | Takipçi: 120 | Takip: 80</p>
-</div>
-
-<!-- ADD POST -->
 <div id="addPost">
   <h3>Yeni Gönderi</h3>
-  <input id="imgUrl" placeholder="Resim URL" style="width:100%;padding:10px"><br><br>
+  <input id="imgUrl" placeholder="Resim URL">
   <button onclick="addPost()">Paylaş</button>
 </div>
 
-<!-- STORY MODAL -->
-<div class="modal" id="storyModal">
-  <span class="close" onclick="closeStory()">✕</span>
-  <img id="storyImg">
+<div id="profile">
+  <img src="https://picsum.photos/200" style="border-radius:50%">
+  <h2>fatih</h2>
+  <p>Mini Instagram Projesi</p>
 </div>
 
-<!-- COMMENT -->
-<div id="commentBox">
-  <input placeholder="Yorum yaz...">
-  <button onclick="closeComment()">Gönder</button>
-</div>
-
-<!-- NAV -->
 <nav>
   <span onclick="showFeed()">🏠</span>
-  <span onclick="alert('Arama yakında')">🔍</span>
   <span onclick="showAdd()">➕</span>
-  <span onclick="alert('Beğeniler yakında')">❤</span>
   <span onclick="showProfile()">👤</span>
 </nav>
 
 <script>
-let stories=[
-"https://picsum.photos/800/1400?1",
-"https://picsum.photos/800/1400?2",
-"https://picsum.photos/800/1400?3"
-];
-let storyIndex=0,storyTimer;
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
 
-function like(el){el.classList.toggle("active");}
+function save(){ localStorage.setItem("posts", JSON.stringify(posts)); }
 
-function openStory(i){
- storyIndex=i;
- document.getElementById("storyModal").style.display="flex";
- playStory();
+function render(){
+  const feed=document.getElementById("feed");
+  feed.innerHTML="";
+  posts.forEach((p,i)=>{
+    feed.innerHTML+=`
+    <div class="post">
+      <img src="${p.img}">
+      <div class="actions">
+        <span class="like ${p.liked?'active':''}" onclick="like(${i})">❤</span>
+      </div>
+      <div class="likes">${p.likes} beğeni</div>
+      <div class="delete" onclick="del(${i})">Gönderiyi sil</div>
+    </div>`;
+  });
 }
 
-function playStory(){
- document.getElementById("storyImg").src=stories[storyIndex];
- storyTimer=setTimeout(()=>{
-  storyIndex++;
-  if(storyIndex<stories.length) playStory();
-  else closeStory();
- },2000);
+function like(i){
+  let p=posts[i];
+  p.liked=!p.liked;
+  p.likes+=p.liked?1:-1;
+  save();render();
 }
 
-function closeStory(){
- clearTimeout(storyTimer);
- document.getElementById("storyModal").style.display="none";
-}
-
-function openComment(){
- document.getElementById("commentBox").style.display="flex";
-}
-
-function closeComment(){
- document.getElementById("commentBox").style.display="none";
-}
-
-function showProfile(){
- hideAll();document.getElementById("profile").style.display="block";
-}
-
-function showAdd(){
- hideAll();document.getElementById("addPost").style.display="block";
-}
-
-function showFeed(){
- hideAll();document.getElementById("feed").style.display="block";
-}
-
-function hideAll(){
- document.getElementById("feed").style.display="none";
- document.getElementById("profile").style.display="none";
- document.getElementById("addPost").style.display="none";
+function del(i){
+  posts.splice(i,1);
+  save();render();
 }
 
 function addPost(){
- let url=document.getElementById("imgUrl").value;
- if(!url)return;
- let post=document.createElement("div");
- post.className="post";
- post.innerHTML=`<img src="${url}">
- <div class="actions">
- <span class="like" onclick="like(this)">❤</span>
- <span onclick="openComment()">💬</span>
- </div><p>Yeni gönderi ✨</p>`;
- document.getElementById("feed").prepend(post);
- showFeed();
+  let url=document.getElementById("imgUrl").value;
+  if(!url) return;
+  posts.unshift({img:url,likes:0,liked:false});
+  save();render();
+  showFeed();
 }
+
+function showFeed(){
+  document.getElementById("feed").style.display="block";
+  document.getElementById("addPost").style.display="none";
+  document.getElementById("profile").style.display="none";
+}
+
+function showAdd(){
+  document.getElementById("feed").style.display="none";
+  document.getElementById("addPost").style.display="block";
+  document.getElementById("profile").style.display="none";
+}
+
+function showProfile(){
+  document.getElementById("feed").style.display="none";
+  document.getElementById("addPost").style.display="none";
+  document.getElementById("profile").style.display="block";
+}
+
+render();
 </script>
 
 </body>
