@@ -11,6 +11,7 @@
       justify-content:center;
       align-items:center;
       height:100vh;
+      margin:0;
     }
     .box {
       background:white;
@@ -38,7 +39,7 @@
 </head>
 <body>
 
-<div class="box" id="login">
+<div class="box" id="loginBox">
   <h2>Admin Giriş</h2>
   <input id="user" placeholder="Kullanıcı adı">
   <input id="pass" type="password" placeholder="Şifre">
@@ -46,7 +47,7 @@
   <p id="msg"></p>
 </div>
 
-<div class="box hidden" id="panel">
+<div class="box hidden" id="panelBox">
   <h2>Admin Panel</h2>
   <input id="content" placeholder="Yeni içerik yaz">
   <button onclick="add()">Ekle</button>
@@ -59,28 +60,29 @@
   const ADMIN_PASS = "123456";
 
   function login() {
-    if (user.value === ADMIN_USER && pass.value === ADMIN_PASS) {
-      loginDiv(false);
+    const u = document.getElementById("user").value;
+    const p = document.getElementById("pass").value;
+
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("panelBox").classList.remove("hidden");
     } else {
-      msg.innerText = "Hatalı giriş ❌";
+      document.getElementById("msg").innerText = "Hatalı giriş ❌";
     }
   }
 
-  function loginDiv(ok) {
-    login.classList.toggle("hidden", ok);
-    panel.classList.toggle("hidden", !ok);
-  }
-
   function add() {
-    if (!content.value) return;
+    const val = document.getElementById("content").value;
+    if (!val) return;
     const li = document.createElement("li");
-    li.innerText = content.value;
-    list.appendChild(li);
-    content.value = "";
+    li.textContent = val;
+    document.getElementById("list").appendChild(li);
+    document.getElementById("content").value = "";
   }
 
   function logout() {
-    loginDiv(false);
+    document.getElementById("panelBox").classList.add("hidden");
+    document.getElementById("loginBox").classList.remove("hidden");
   }
 </script>
 
