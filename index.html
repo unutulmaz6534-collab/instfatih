@@ -1,37 +1,112 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>InstFatih</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #121212;
+      background: #000;
       color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
     }
-    .box {
+
+    .app {
+      max-width: 420px;
+      margin: auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 12px;
+      font-size: 22px;
+      font-weight: bold;
+      border-bottom: 1px solid #222;
       text-align: center;
     }
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
+
+    .stories {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      overflow-x: auto;
+      border-bottom: 1px solid #222;
     }
-    p {
-      color: #aaa;
+
+    .story {
+      width: 60px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .story img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid #ff004f;
+    }
+
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .post {
+      border-bottom: 1px solid #222;
+    }
+
+    .post img {
+      width: 100%;
+      display: block;
+    }
+
+    .post .actions {
+      padding: 8px;
+      font-size: 18px;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid #222;
+      font-size: 20px;
     }
   </style>
 </head>
+
 <body>
-  <div class="box">
-    <h1>📸 InstFatih</h1>
-    <p>Mobil sosyal medya projesi</p>
-    <p>Yakında burada 👀</p>
+  <div class="app">
+
+    <header>InstFatih</header>
+
+    <div class="stories">
+      <div class="story"><img src="https://i.pravatar.cc/60?1"><div>Ali</div></div>
+      <div class="story"><img src="https://i.pravatar.cc/60?2"><div>Ayşe</div></div>
+      <div class="story"><img src="https://i.pravatar.cc/60?3"><div>Mehmet</div></div>
+      <div class="story"><img src="https://i.pravatar.cc/60?4"><div>Fatih</div></div>
+    </div>
+
+    <div class="feed">
+      <div class="post">
+        <img src="https://picsum.photos/400/400?1">
+        <div class="actions">❤️ 💬 ✈️</div>
+      </div>
+
+      <div class="post">
+        <img src="https://picsum.photos/400/400?2">
+        <div class="actions">❤️ 💬 ✈️</div>
+      </div>
+    </div>
+
+    <footer>
+      🏠 🔍 ➕ ❤️ 👤
+    </footer>
+
   </div>
 </body>
 </html>
