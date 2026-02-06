@@ -1,165 +1,60 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<title>InstFatih</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff;overflow:hidden}
-header{text-align:center;padding:12px;font-size:22px;border-bottom:1px solid #222}
-
-/* NAV */
-nav{
- position:fixed;bottom:0;width:100%;
- background:#000;border-top:1px solid #222;
- display:flex;justify-content:space-around;
- padding:10px;font-size:22px;z-index:10
-}
-nav span{cursor:pointer}
-
-/* PAGES */
-.page{display:none;overflow-y:auto;height:calc(100vh - 110px)}
-#feed{display:block}
-
-/* USER BAR */
-#users{display:flex;gap:10px;padding:10px;overflow-x:auto}
-.user{padding:6px 10px;border:1px solid #333;border-radius:20px;cursor:pointer}
-.user.active{background:#ff0050}
-
-/* POST */
-.post img{width:100%}
-.post{border-bottom:1px solid #222;padding-bottom:10px}
-.like{font-size:22px;cursor:pointer}
-.like.active{color:red}
-
-/* ADD */
-#add input{width:100%;padding:10px;margin:10px 0}
-
-/* REELS */
-#reels{scroll-snap-type:y mandatory}
-.reel{
- height:100vh;scroll-snap-align:start;
- display:flex;justify-content:center;align-items:center;
- position:relative
-}
-.reel video{
- width:100%;height:100%;object-fit:cover
-}
-.reel .like{
- position:absolute;right:20px;bottom:100px;font-size:30px
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Instafatih</title>
 </head>
 <body>
 
-<header>📸 InstFatih</header>
+<h2>Instafatih Giriş</h2>
 
-<!-- USERS -->
-<div id="users"></div>
+<input type="email" id="email" placeholder="E-posta"><br><br>
+<input type="password" id="password" placeholder="Şifre"><br><br>
 
-<!-- FEED -->
-<div id="feed" class="page"></div>
+<button onclick="register()">Kayıt Ol</button>
+<button onclick="login()">Giriş Yap</button>
 
-<!-- ADD -->
-<div id="add" class="page">
-  <input id="imgUrl" placeholder="Resim URL">
-  <button onclick="addPost()">Paylaş</button>
-</div>
+<p id="msg"></p>
 
-<!-- REELS -->
-<div id="reels" class="page"></div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-<nav>
- <span onclick="show('feed')">🏠</span>
- <span onclick="show('reels')">🎞️</span>
- <span onclick="show('add')">➕</span>
-</nav>
+  const firebaseConfig = {
+    apiKey: "BURAYA_KENDİ_API_KEY",
+    authDomain: "instafatih-c5c18.firebaseapp.com",
+    projectId: "instafatih-c5c18",
+    appId: "BURAYA_KENDİ_APP_ID"
+  };
 
-<script>
-let users = JSON.parse(localStorage.getItem("users")) || ["fatih"];
-let currentUser = localStorage.getItem("currentUser") || users[0];
-let posts = JSON.parse(localStorage.getItem("posts")) || [];
-let reels = JSON.parse(localStorage.getItem("reels")) || [
- "https://www.w3schools.com/html/mov_bbb.mp4",
- "https://www.w3schools.com/html/movie.mp4"
-];
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-function save(){
- localStorage.setItem("users",JSON.stringify(users));
- localStorage.setItem("currentUser",currentUser);
- localStorage.setItem("posts",JSON.stringify(posts));
- localStorage.setItem("reels",JSON.stringify(reels));
-}
+  window.register = function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-function renderUsers(){
- const u=document.getElementById("users");
- u.innerHTML="";
- users.forEach(name=>{
-  u.innerHTML+=`<div class="user ${name==currentUser?'active':''}" onclick="switchUser('${name}')">${name}</div>`;
- });
- u.innerHTML+=`<div class="user" onclick="addUser()">＋</div>`;
-}
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        document.getElementById("msg").innerText = "Kayıt başarılı ✅";
+      })
+      .catch(e => {
+        document.getElementById("msg").innerText = e.message;
+      });
+  }
 
-function addUser(){
- let name=prompt("Kullanıcı adı");
- if(!name) return;
- users.push(name);
- currentUser=name;
- save();renderUsers();renderFeed();
-}
+  window.login = function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-function switchUser(name){
- currentUser=name;
- save();renderUsers();renderFeed();
-}
-
-function renderFeed(){
- const f=document.getElementById("feed");
- f.innerHTML="";
- posts.filter(p=>p.user==currentUser).forEach((p,i)=>{
-  f.innerHTML+=`
-  <div class="post">
-   <img src="${p.img}">
-   <div class="like ${p.liked?'active':''}" onclick="like(${i})">❤ ${p.likes}</div>
-  </div>`;
- });
-}
-
-function addPost(){
- let url=document.getElementById("imgUrl").value;
- if(!url) return;
- posts.unshift({user:currentUser,img:url,likes:0,liked:false});
- save();renderFeed();show("feed");
-}
-
-function like(i){
- let p=posts[i];
- p.liked=!p.liked;
- p.likes+=p.liked?1:-1;
- save();renderFeed();
-}
-
-function renderReels(){
- const r=document.getElementById("reels");
- r.innerHTML="";
- reels.forEach((v,i)=>{
-  r.innerHTML+=`
-  <div class="reel">
-   <video src="${v}" autoplay muted loop></video>
-   <div class="like" onclick="alert('Beğenildi')">❤</div>
-  </div>`;
- });
-}
-
-function show(id){
- document.querySelectorAll(".page").forEach(p=>p.style.display="none");
- document.getElementById(id).style.display="block";
-}
-
-renderUsers();
-renderFeed();
-renderReels();
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        document.getElementById("msg").innerText = "Giriş başarılı 🚀";
+      })
+      .catch(e => {
+        document.getElementById("msg").innerText = e.message;
+      });
+  }
 </script>
 
 </body>
