@@ -6,189 +6,160 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff}
-
-/* HEADER */
-header{text-align:center;padding:15px;font-size:24px;border-bottom:1px solid #222}
-
-/* STORIES */
-.stories{display:flex;gap:12px;padding:10px;overflow-x:auto}
-.story{text-align:center;cursor:pointer}
-.story img{
-  width:70px;height:70px;border-radius:50%;
-  border:3px solid #ff0050;object-fit:cover
-}
-
-/* POST */
-.post{padding:10px;border-bottom:1px solid #222}
-.post img{width:100%;border-radius:10px}
-.actions{display:flex;gap:15px;font-size:22px;margin:6px 0}
-.like{cursor:pointer}
-.like.active{color:red}
-.likes{font-size:14px;color:#ccc}
-.delete{color:#f55;font-size:14px;cursor:pointer}
+body{background:#000;color:#fff;overflow:hidden}
+header{text-align:center;padding:12px;font-size:22px;border-bottom:1px solid #222}
 
 /* NAV */
 nav{
-  position:fixed;bottom:0;width:100%;
-  background:#000;border-top:1px solid #222;
-  display:flex;justify-content:space-around;
-  padding:10px;font-size:22px
+ position:fixed;bottom:0;width:100%;
+ background:#000;border-top:1px solid #222;
+ display:flex;justify-content:space-around;
+ padding:10px;font-size:22px;z-index:10
 }
+nav span{cursor:pointer}
 
-/* STORY MODAL */
-#storyModal{
-  position:fixed;inset:0;background:#000;
-  display:none;justify-content:center;
-  align-items:center;z-index:9999
-}
-#storyModal img{
-  width:100%;height:100%;object-fit:contain
-}
-#closeStory{
-  position:absolute;top:20px;right:20px;
-  font-size:28px;cursor:pointer
-}
+/* PAGES */
+.page{display:none;overflow-y:auto;height:calc(100vh - 110px)}
+#feed{display:block}
 
-/* ADD / PROFILE */
-#addPost,#profile{display:none;padding:15px;text-align:center}
-#addPost input{width:100%;padding:10px;margin-bottom:10px}
+/* USER BAR */
+#users{display:flex;gap:10px;padding:10px;overflow-x:auto}
+.user{padding:6px 10px;border:1px solid #333;border-radius:20px;cursor:pointer}
+.user.active{background:#ff0050}
+
+/* POST */
+.post img{width:100%}
+.post{border-bottom:1px solid #222;padding-bottom:10px}
+.like{font-size:22px;cursor:pointer}
+.like.active{color:red}
+
+/* ADD */
+#add input{width:100%;padding:10px;margin:10px 0}
+
+/* REELS */
+#reels{scroll-snap-type:y mandatory}
+.reel{
+ height:100vh;scroll-snap-align:start;
+ display:flex;justify-content:center;align-items:center;
+ position:relative
+}
+.reel video{
+ width:100%;height:100%;object-fit:cover
+}
+.reel .like{
+ position:absolute;right:20px;bottom:100px;font-size:30px
+}
 </style>
 </head>
-
 <body>
 
 <header>📸 InstFatih</header>
 
-<!-- STORIES -->
-<div class="stories">
-  <div class="story" onclick="openStory(0)">
-    <img src="https://picsum.photos/100?1"><small>fatih</small>
-  </div>
-  <div class="story" onclick="openStory(1)">
-    <img src="https://picsum.photos/100?2"><small>ali</small>
-  </div>
-  <div class="story" onclick="openStory(2)">
-    <img src="https://picsum.photos/100?3"><small>ayşe</small>
-  </div>
-</div>
+<!-- USERS -->
+<div id="users"></div>
 
 <!-- FEED -->
-<div id="feed"></div>
+<div id="feed" class="page"></div>
 
-<!-- ADD POST -->
-<div id="addPost">
-  <h3>Yeni Gönderi</h3>
+<!-- ADD -->
+<div id="add" class="page">
   <input id="imgUrl" placeholder="Resim URL">
   <button onclick="addPost()">Paylaş</button>
 </div>
 
-<!-- PROFILE -->
-<div id="profile">
-  <img src="https://picsum.photos/200" style="border-radius:50%">
-  <h2>fatih</h2>
-  <p>Mini Instagram Projesi</p>
-</div>
+<!-- REELS -->
+<div id="reels" class="page"></div>
 
-<!-- STORY MODAL -->
-<div id="storyModal">
-  <div id="closeStory" onclick="closeStory()">✕</div>
-  <img id="storyImg">
-</div>
-
-<!-- NAV -->
 <nav>
-  <span onclick="showFeed()">🏠</span>
-  <span onclick="showAdd()">➕</span>
-  <span onclick="showProfile()">👤</span>
+ <span onclick="show('feed')">🏠</span>
+ <span onclick="show('reels')">🎞️</span>
+ <span onclick="show('add')">➕</span>
 </nav>
 
 <script>
-/* POSTS */
+let users = JSON.parse(localStorage.getItem("users")) || ["fatih"];
+let currentUser = localStorage.getItem("currentUser") || users[0];
 let posts = JSON.parse(localStorage.getItem("posts")) || [];
-function save(){localStorage.setItem("posts",JSON.stringify(posts));}
+let reels = JSON.parse(localStorage.getItem("reels")) || [
+ "https://www.w3schools.com/html/mov_bbb.mp4",
+ "https://www.w3schools.com/html/movie.mp4"
+];
 
-function render(){
-  const f=document.getElementById("feed");
-  f.innerHTML="";
-  posts.forEach((p,i)=>{
-    f.innerHTML+=`
-    <div class="post">
-      <img src="${p.img}">
-      <div class="actions">
-        <span class="like ${p.liked?'active':''}" onclick="like(${i})">❤</span>
-      </div>
-      <div class="likes">${p.likes} beğeni</div>
-      <div class="delete" onclick="del(${i})">Gönderiyi sil</div>
-    </div>`;
-  });
+function save(){
+ localStorage.setItem("users",JSON.stringify(users));
+ localStorage.setItem("currentUser",currentUser);
+ localStorage.setItem("posts",JSON.stringify(posts));
+ localStorage.setItem("reels",JSON.stringify(reels));
 }
 
-function like(i){
-  let p=posts[i];
-  p.liked=!p.liked;
-  p.likes+=p.liked?1:-1;
-  save();render();
+function renderUsers(){
+ const u=document.getElementById("users");
+ u.innerHTML="";
+ users.forEach(name=>{
+  u.innerHTML+=`<div class="user ${name==currentUser?'active':''}" onclick="switchUser('${name}')">${name}</div>`;
+ });
+ u.innerHTML+=`<div class="user" onclick="addUser()">＋</div>`;
 }
 
-function del(i){
-  posts.splice(i,1);
-  save();render();
+function addUser(){
+ let name=prompt("Kullanıcı adı");
+ if(!name) return;
+ users.push(name);
+ currentUser=name;
+ save();renderUsers();renderFeed();
+}
+
+function switchUser(name){
+ currentUser=name;
+ save();renderUsers();renderFeed();
+}
+
+function renderFeed(){
+ const f=document.getElementById("feed");
+ f.innerHTML="";
+ posts.filter(p=>p.user==currentUser).forEach((p,i)=>{
+  f.innerHTML+=`
+  <div class="post">
+   <img src="${p.img}">
+   <div class="like ${p.liked?'active':''}" onclick="like(${i})">❤ ${p.likes}</div>
+  </div>`;
+ });
 }
 
 function addPost(){
-  let url=document.getElementById("imgUrl").value;
-  if(!url) return;
-  posts.unshift({img:url,likes:0,liked:false});
-  save();render();showFeed();
+ let url=document.getElementById("imgUrl").value;
+ if(!url) return;
+ posts.unshift({user:currentUser,img:url,likes:0,liked:false});
+ save();renderFeed();show("feed");
 }
 
-/* STORY */
-const stories=[
- "https://picsum.photos/800/1400?1",
- "https://picsum.photos/800/1400?2",
- "https://picsum.photos/800/1400?3"
-];
-let storyTimer,storyIndex=0;
-
-function openStory(i){
-  storyIndex=i;
-  document.getElementById("storyModal").style.display="flex";
-  playStory();
+function like(i){
+ let p=posts[i];
+ p.liked=!p.liked;
+ p.likes+=p.liked?1:-1;
+ save();renderFeed();
 }
 
-function playStory(){
-  document.getElementById("storyImg").src=stories[storyIndex];
-  storyTimer=setTimeout(()=>{
-    storyIndex++;
-    if(storyIndex<stories.length) playStory();
-    else closeStory();
-  },2000);
+function renderReels(){
+ const r=document.getElementById("reels");
+ r.innerHTML="";
+ reels.forEach((v,i)=>{
+  r.innerHTML+=`
+  <div class="reel">
+   <video src="${v}" autoplay muted loop></video>
+   <div class="like" onclick="alert('Beğenildi')">❤</div>
+  </div>`;
+ });
 }
 
-function closeStory(){
-  clearTimeout(storyTimer);
-  document.getElementById("storyModal").style.display="none";
+function show(id){
+ document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+ document.getElementById(id).style.display="block";
 }
 
-/* NAV */
-function showFeed(){
- document.getElementById("feed").style.display="block";
- document.getElementById("addPost").style.display="none";
- document.getElementById("profile").style.display="none";
-}
-function showAdd(){
- document.getElementById("feed").style.display="none";
- document.getElementById("addPost").style.display="block";
- document.getElementById("profile").style.display="none";
-}
-function showProfile(){
- document.getElementById("feed").style.display="none";
- document.getElementById("addPost").style.display="none";
- document.getElementById("profile").style.display="block";
-}
-
-render();
+renderUsers();
+renderFeed();
+renderReels();
 </script>
 
 </body>
