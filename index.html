@@ -1,89 +1,89 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Panel</title>
-  <style>
-    body {
-      font-family: Arial;
-      background:#f2f2f2;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      margin:0;
-    }
-    .box {
-      background:white;
-      padding:20px;
-      width:300px;
-      text-align:center;
-      border-radius:6px;
-      box-shadow:0 0 10px rgba(0,0,0,0.1);
-    }
-    input, button {
-      width:100%;
-      padding:10px;
-      margin:6px 0;
-    }
-    button {
-      background:#222;
-      color:white;
-      border:none;
-      cursor:pointer;
-    }
-    .hidden { display:none; }
-    ul { text-align:left; padding:0; }
-    li { list-style:none; border-bottom:1px solid #ddd; padding:5px 0; }
-  </style>
+<meta charset="UTF-8">
+<title>Mini Instagram</title>
+<style>
+body{font-family:Arial;background:#fafafa;margin:0}
+.box{max-width:400px;margin:30px auto;background:#fff;padding:15px;border-radius:8px}
+input,button{width:100%;padding:10px;margin:6px 0}
+button{background:#3897f0;color:#fff;border:none}
+.post{border:1px solid #ddd;margin:10px 0;border-radius:6px}
+.post img{width:100%}
+.post p{padding:10px;margin:0}
+.hidden{display:none}
+</style>
 </head>
 <body>
 
-<div class="box" id="loginBox">
-  <h2>Admin Giriş</h2>
-  <input id="user" placeholder="Kullanıcı adı">
-  <input id="pass" type="password" placeholder="Şifre">
-  <button onclick="login()">Giriş Yap</button>
-  <p id="msg"></p>
+<div class="box" id="login">
+<h3>Giriş</h3>
+<input id="user" placeholder="Kullanıcı adı">
+<input id="pass" type="password" placeholder="Şifre">
+<button onclick="login()">Giriş Yap</button>
+<p id="msg"></p>
 </div>
 
-<div class="box hidden" id="panelBox">
-  <h2>Admin Panel</h2>
-  <input id="content" placeholder="Yeni içerik yaz">
-  <button onclick="add()">Ekle</button>
-  <ul id="list"></ul>
-  <button onclick="logout()">Çıkış</button>
+<div class="box hidden" id="admin">
+<h3>Admin Panel</h3>
+<input id="text" placeholder="Açıklama">
+<input type="file" id="img">
+<button onclick="addPost()">Paylaş</button>
+<button onclick="logout()">Çıkış</button>
+</div>
+
+<div class="box hidden" id="feed">
+<h3>Ana Sayfa</h3>
+<div id="posts"></div>
+<button onclick="logout()">Çıkış</button>
 </div>
 
 <script>
-  const ADMIN_USER = "admin";
-  const ADMIN_PASS = "123456";
+const users={
+  admin:{pass:"123456",role:"admin"},
+  user:{pass:"123456",role:"user"}
+};
 
-  function login() {
-    const u = document.getElementById("user").value;
-    const p = document.getElementById("pass").value;
+function login(){
+  const u=user.value,p=pass.value;
+  if(users[u] && users[u].pass===p){
+    loginDiv(true);
+    if(users[u].role==="admin") admin.classList.remove("hidden");
+    feed.classList.remove("hidden");
+    loadPosts();
+  }else msg.innerText="Hatalı giriş";
+}
 
-    if (u === ADMIN_USER && p === ADMIN_PASS) {
-      document.getElementById("loginBox").classList.add("hidden");
-      document.getElementById("panelBox").classList.remove("hidden");
-    } else {
-      document.getElementById("msg").innerText = "Hatalı giriş ❌";
-    }
+function loginDiv(ok){
+  login.classList.toggle("hidden",ok);
+}
+
+function logout(){location.reload();}
+
+function addPost(){
+  const reader=new FileReader();
+  const file=img.files[0];
+  reader.onload=()=>{
+    const posts=JSON.parse(localStorage.getItem("posts")||"[]");
+    posts.unshift({text:text.value,img:reader.result});
+    localStorage.setItem("posts",JSON.stringify(posts));
+    text.value="";img.value="";
+    loadPosts();
   }
+  if(file) reader.readAsDataURL(file);
+}
 
-  function add() {
-    const val = document.getElementById("content").value;
-    if (!val) return;
-    const li = document.createElement("li");
-    li.textContent = val;
-    document.getElementById("list").appendChild(li);
-    document.getElementById("content").value = "";
-  }
-
-  function logout() {
-    document.getElementById("panelBox").classList.add("hidden");
-    document.getElementById("loginBox").classList.remove("hidden");
-  }
+function loadPosts(){
+  posts.innerHTML="";
+  const data=JSON.parse(localStorage.getItem("posts")||"[]");
+  data.forEach(p=>{
+    posts.innerHTML+=`
+      <div class="post">
+        <img src="${p.img}">
+        <p>${p.text}</p>
+      </div>`;
+  });
+}
 </script>
 
 </body>
