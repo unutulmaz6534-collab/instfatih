@@ -7,9 +7,19 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
 body{background:#000;color:#fff}
+
+/* HEADER */
 header{text-align:center;padding:15px;font-size:24px;border-bottom:1px solid #222}
+
+/* STORIES */
 .stories{display:flex;gap:12px;padding:10px;overflow-x:auto}
-.story img{width:70px;height:70px;border-radius:50%;border:3px solid #ff0050}
+.story{text-align:center;cursor:pointer}
+.story img{
+  width:70px;height:70px;border-radius:50%;
+  border:3px solid #ff0050;object-fit:cover
+}
+
+/* POST */
 .post{padding:10px;border-bottom:1px solid #222}
 .post img{width:100%;border-radius:10px}
 .actions{display:flex;gap:15px;font-size:22px;margin:6px 0}
@@ -17,37 +27,76 @@ header{text-align:center;padding:15px;font-size:24px;border-bottom:1px solid #22
 .like.active{color:red}
 .likes{font-size:14px;color:#ccc}
 .delete{color:#f55;font-size:14px;cursor:pointer}
-nav{position:fixed;bottom:0;width:100%;background:#000;border-top:1px solid #222;
-display:flex;justify-content:space-around;padding:10px;font-size:22px}
-#addPost{display:none;padding:15px}
+
+/* NAV */
+nav{
+  position:fixed;bottom:0;width:100%;
+  background:#000;border-top:1px solid #222;
+  display:flex;justify-content:space-around;
+  padding:10px;font-size:22px
+}
+
+/* STORY MODAL */
+#storyModal{
+  position:fixed;inset:0;background:#000;
+  display:none;justify-content:center;
+  align-items:center;z-index:9999
+}
+#storyModal img{
+  width:100%;height:100%;object-fit:contain
+}
+#closeStory{
+  position:absolute;top:20px;right:20px;
+  font-size:28px;cursor:pointer
+}
+
+/* ADD / PROFILE */
+#addPost,#profile{display:none;padding:15px;text-align:center}
 #addPost input{width:100%;padding:10px;margin-bottom:10px}
-#profile{display:none;text-align:center;padding:20px}
 </style>
 </head>
+
 <body>
 
 <header>📸 InstFatih</header>
 
+<!-- STORIES -->
 <div class="stories">
-  <div class="story"><img src="https://picsum.photos/100?1"></div>
-  <div class="story"><img src="https://picsum.photos/100?2"></div>
-  <div class="story"><img src="https://picsum.photos/100?3"></div>
+  <div class="story" onclick="openStory(0)">
+    <img src="https://picsum.photos/100?1"><small>fatih</small>
+  </div>
+  <div class="story" onclick="openStory(1)">
+    <img src="https://picsum.photos/100?2"><small>ali</small>
+  </div>
+  <div class="story" onclick="openStory(2)">
+    <img src="https://picsum.photos/100?3"><small>ayşe</small>
+  </div>
 </div>
 
+<!-- FEED -->
 <div id="feed"></div>
 
+<!-- ADD POST -->
 <div id="addPost">
   <h3>Yeni Gönderi</h3>
   <input id="imgUrl" placeholder="Resim URL">
   <button onclick="addPost()">Paylaş</button>
 </div>
 
+<!-- PROFILE -->
 <div id="profile">
   <img src="https://picsum.photos/200" style="border-radius:50%">
   <h2>fatih</h2>
   <p>Mini Instagram Projesi</p>
 </div>
 
+<!-- STORY MODAL -->
+<div id="storyModal">
+  <div id="closeStory" onclick="closeStory()">✕</div>
+  <img id="storyImg">
+</div>
+
+<!-- NAV -->
 <nav>
   <span onclick="showFeed()">🏠</span>
   <span onclick="showAdd()">➕</span>
@@ -55,15 +104,15 @@ display:flex;justify-content:space-around;padding:10px;font-size:22px}
 </nav>
 
 <script>
+/* POSTS */
 let posts = JSON.parse(localStorage.getItem("posts")) || [];
-
-function save(){ localStorage.setItem("posts", JSON.stringify(posts)); }
+function save(){localStorage.setItem("posts",JSON.stringify(posts));}
 
 function render(){
-  const feed=document.getElementById("feed");
-  feed.innerHTML="";
+  const f=document.getElementById("feed");
+  f.innerHTML="";
   posts.forEach((p,i)=>{
-    feed.innerHTML+=`
+    f.innerHTML+=`
     <div class="post">
       <img src="${p.img}">
       <div class="actions">
@@ -91,26 +140,52 @@ function addPost(){
   let url=document.getElementById("imgUrl").value;
   if(!url) return;
   posts.unshift({img:url,likes:0,liked:false});
-  save();render();
-  showFeed();
+  save();render();showFeed();
 }
 
+/* STORY */
+const stories=[
+ "https://picsum.photos/800/1400?1",
+ "https://picsum.photos/800/1400?2",
+ "https://picsum.photos/800/1400?3"
+];
+let storyTimer,storyIndex=0;
+
+function openStory(i){
+  storyIndex=i;
+  document.getElementById("storyModal").style.display="flex";
+  playStory();
+}
+
+function playStory(){
+  document.getElementById("storyImg").src=stories[storyIndex];
+  storyTimer=setTimeout(()=>{
+    storyIndex++;
+    if(storyIndex<stories.length) playStory();
+    else closeStory();
+  },2000);
+}
+
+function closeStory(){
+  clearTimeout(storyTimer);
+  document.getElementById("storyModal").style.display="none";
+}
+
+/* NAV */
 function showFeed(){
-  document.getElementById("feed").style.display="block";
-  document.getElementById("addPost").style.display="none";
-  document.getElementById("profile").style.display="none";
+ document.getElementById("feed").style.display="block";
+ document.getElementById("addPost").style.display="none";
+ document.getElementById("profile").style.display="none";
 }
-
 function showAdd(){
-  document.getElementById("feed").style.display="none";
-  document.getElementById("addPost").style.display="block";
-  document.getElementById("profile").style.display="none";
+ document.getElementById("feed").style.display="none";
+ document.getElementById("addPost").style.display="block";
+ document.getElementById("profile").style.display="none";
 }
-
 function showProfile(){
-  document.getElementById("feed").style.display="none";
-  document.getElementById("addPost").style.display="none";
-  document.getElementById("profile").style.display="block";
+ document.getElementById("feed").style.display="none";
+ document.getElementById("addPost").style.display="none";
+ document.getElementById("profile").style.display="block";
 }
 
 render();
