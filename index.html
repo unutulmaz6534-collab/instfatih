@@ -4,102 +4,34 @@
   <meta charset="UTF-8">
   <title>InstFatih</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
-    body {
-      margin: 0;
+    body{
+      margin:0;
       font-family: Arial, sans-serif;
-      background: #000;
-      color: #fff;
+      background:#000;
+      color:#fff;
     }
-
-    .app {
-      max-width: 420px;
-      margin: auto;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
+    header{
+      padding:15px;
+      text-align:center;
+      font-size:24px;
+      border-bottom:1px solid #222;
     }
-
-    .header {
-      text-align: center;
-      padding: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      border-bottom: 1px solid #222;
+    .stories{
+      display:flex;
+      gap:15px;
+      padding:15px;
+      overflow-x:auto;
+      border-bottom:1px solid #222;
     }
-
-    .stories {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      overflow-x: auto;
-      border-bottom: 1px solid #222;
+    .story{
+      text-align:center;
+      font-size:12px;
     }
-
-    .story {
-      width: 60px;
-      text-align: center;
-      font-size: 12px;
+    .story img{
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      border:2px solid #ff0055;
     }
-
-    .story img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 2px solid #ff004f;
-    }
-
-    .feed {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .post {
-      border-bottom: 1px solid #222;
-    }
-
-    .post img {
-      width: 100%;
-      display: block;
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      border-top: 1px solid #222;
-      font-size: 22px;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="app">
-    <div class="header">📸 InstFatih</div>
-
-    <div class="stories">
-      <div class="story"><img src="https://via.placeholder.com/60"><div>fatih</div></div>
-      <div class="story"><img src="https://via.placeholder.com/60"><div>ali</div></div>
-      <div class="story"><img src="https://via.placeholder.com/60"><div>ayşe</div></div>
-    </div>
-
-    <div class="feed">
-      <div class="post">
-        <img src="https://via.placeholder.com/400x300">
-      </div>
-      <div class="post">
-        <img src="https://via.placeholder.com/400x350">
-      </div>
-    </div>
-
-    <div class="nav">
-      <span>🏠</span>
-      <span>🔍</span>
-      <span>➕</span>
-      <span>❤️</span>
-      <span>👤</span>
-    </div>
-  </div>
-</body>
-</html>
+    .
