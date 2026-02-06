@@ -11,32 +11,65 @@ body{background:#000;color:#fff}
 
 /* LOGIN */
 #login{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
-#login input{padding:10px;margin:5px;width:200px}
-#login button{padding:10px;width:200px}
+#login input{padding:10px;margin:5px;width:220px}
+#login button{padding:10px;width:220px}
 
 /* HEADER */
 header{text-align:center;padding:15px;font-size:24px;border-bottom:1px solid #222}
 
 /* STORIES */
-.stories{display:flex;gap:10px;padding:10px;overflow-x:auto}
-.story{text-align:center}
-.story img{width:70px;height:70px;border-radius:50%;border:3px solid #ff0050}
+.stories{display:flex;gap:12px;padding:10px;overflow-x:auto}
+.story{text-align:center;cursor:pointer}
+.story img{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  border:3px solid #ff0050;
+  object-fit:cover;
+}
 
 /* POST */
 .post{padding:10px;border-bottom:1px solid #222}
 .post img{width:100%;border-radius:10px}
-.actions{display:flex;gap:15px;font-size:22px;margin-top:5px;cursor:pointer}
+.actions{display:flex;gap:15px;font-size:22px;margin-top:5px}
+.like{cursor:pointer}
 .like.active{color:red}
 
 /* NAV */
-nav{position:fixed;bottom:0;width:100%;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:10px;font-size:22px}
+nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#000;
+  border-top:1px solid #222;
+  display:flex;
+  justify-content:space-around;
+  padding:10px;
+  font-size:22px;
+}
 
 /* STORY MODAL */
-#storyModal{position:fixed;inset:0;background:#000;display:none;justify-content:center;align-items:center}
-#storyModal img{width:90%}
-
-/* PROFILE */
-#profile{text-align:center;padding:20px}
+#storyModal{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+#storyModal img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+#storyClose{
+  position:absolute;
+  top:20px;
+  right:20px;
+  font-size:28px;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -56,19 +89,23 @@ nav{position:fixed;bottom:0;width:100%;background:#000;border-top:1px solid #222
 <header>📸 InstFatih</header>
 
 <div class="stories">
-  <div class="story" onclick="openStory('https://picsum.photos/400')">
-    <img src="https://picsum.photos/100">
+  <div class="story" onclick="openStory('https://picsum.photos/800/1400')">
+    <img src="https://picsum.photos/100?1">
     <small>fatih</small>
   </div>
-  <div class="story" onclick="openStory('https://picsum.photos/401')">
-    <img src="https://picsum.photos/101">
+  <div class="story" onclick="openStory('https://picsum.photos/801/1400')">
+    <img src="https://picsum.photos/100?2">
     <small>ali</small>
+  </div>
+  <div class="story" onclick="openStory('https://picsum.photos/802/1400')">
+    <img src="https://picsum.photos/100?3">
+    <small>ayşe</small>
   </div>
 </div>
 
 <div id="feed">
   <div class="post">
-    <img src="https://picsum.photos/500">
+    <img src="https://picsum.photos/600/600">
     <div class="actions">
       <span class="like" onclick="like(this)">❤</span>
       💬 📦
@@ -88,7 +125,8 @@ nav{position:fixed;bottom:0;width:100%;background:#000;border-top:1px solid #222
 </div>
 
 <!-- STORY MODAL -->
-<div id="storyModal" onclick="closeStory()">
+<div id="storyModal">
+  <div id="storyClose" onclick="closeStory()">✕</div>
   <img id="storyImg">
 </div>
 
@@ -103,12 +141,14 @@ function like(el){
 }
 
 function openStory(src){
-  document.getElementById("storyImg").src=src;
-  document.getElementById("storyModal").style.display="flex";
+  const modal = document.getElementById("storyModal");
+  const img = document.getElementById("storyImg");
+  img.src = src;
+  modal.style.display = "flex";
 }
 
 function closeStory(){
-  document.getElementById("storyModal").style.display="none";
+  document.getElementById("storyModal").style.display = "none";
 }
 </script>
 
