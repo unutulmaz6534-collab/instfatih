@@ -1,155 +1,115 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InstFatih</title>
-  <style>
-    body {
-      margin: 0;
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<title>InstFatih</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#000;color:#fff}
+.hidden{display:none}
 
-    header {
-      padding: 15px;
-      text-align: center;
-      font-size: 22px;
-      border-bottom: 1px solid #222;
-    }
+/* LOGIN */
+#login{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
+#login input{padding:10px;margin:5px;width:200px}
+#login button{padding:10px;width:200px}
 
-    .stories {
-      display: flex;
-      gap: 15px;
-      padding: 15px;
-      overflow-x: auto;
-      border-bottom: 1px solid #222;
-    }
+/* HEADER */
+header{text-align:center;padding:15px;font-size:24px;border-bottom:1px solid #222}
 
-    .story {
-      text-align: center;
-      font-size: 13px;
-    }
+/* STORIES */
+.stories{display:flex;gap:10px;padding:10px;overflow-x:auto}
+.story{text-align:center}
+.story img{width:70px;height:70px;border-radius:50%;border:3px solid #ff0050}
 
-    .story img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 3px solid #ff0050;
-    }
+/* POST */
+.post{padding:10px;border-bottom:1px solid #222}
+.post img{width:100%;border-radius:10px}
+.actions{display:flex;gap:15px;font-size:22px;margin-top:5px;cursor:pointer}
+.like.active{color:red}
 
-    .post {
-      padding: 15px;
-      border-bottom: 1px solid #222;
-    }
+/* NAV */
+nav{position:fixed;bottom:0;width:100%;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;padding:10px;font-size:22px}
 
-    .post-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+/* STORY MODAL */
+#storyModal{position:fixed;inset:0;background:#000;display:none;justify-content:center;align-items:center}
+#storyModal img{width:90%}
 
-    .post-header img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-
-    .post img {
-      width: 100%;
-      border-radius: 8px;
-      margin: 10px 0;
-    }
-
-    .actions {
-      display: flex;
-      gap: 15px;
-      font-size: 22px;
-      cursor: pointer;
-    }
-
-    .likes {
-      margin-top: 5px;
-      font-size: 14px;
-    }
-
-    footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: #000;
-      border-top: 1px solid #222;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      font-size: 22px;
-    }
-  </style>
+/* PROFILE */
+#profile{text-align:center;padding:20px}
+</style>
 </head>
+
 <body>
+
+<!-- LOGIN -->
+<div id="login">
+  <h2>InstFatih</h2>
+  <input placeholder="Kullanıcı adı">
+  <input type="password" placeholder="Şifre">
+  <button onclick="login()">Giriş Yap</button>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
 
 <header>📸 InstFatih</header>
 
 <div class="stories">
-  <div class="story">
-    <img src="https://picsum.photos/60?1">
-    <div>fatih</div>
+  <div class="story" onclick="openStory('https://picsum.photos/400')">
+    <img src="https://picsum.photos/100">
+    <small>fatih</small>
   </div>
-  <div class="story">
-    <img src="https://picsum.photos/60?2">
-    <div>ali</div>
-  </div>
-  <div class="story">
-    <img src="https://picsum.photos/60?3">
-    <div>ayşe</div>
+  <div class="story" onclick="openStory('https://picsum.photos/401')">
+    <img src="https://picsum.photos/101">
+    <small>ali</small>
   </div>
 </div>
 
-<div class="post">
-  <div class="post-header">
-    <img src="https://picsum.photos/40?4">
-    <strong>fatih</strong>
+<div id="feed">
+  <div class="post">
+    <img src="https://picsum.photos/500">
+    <div class="actions">
+      <span class="like" onclick="like(this)">❤</span>
+      💬 📦
+    </div>
+    <p>İlk gönderim 🚀</p>
   </div>
-  <img src="https://picsum.photos/400/300?5">
-  <div class="actions">
-    <span onclick="like(this)">❤️</span>
-    <span>💬</span>
-    <span>📤</span>
-  </div>
-  <div class="likes">Beğeni: <span>0</span></div>
-  <p>İlk gönderim 🚀</p>
 </div>
 
-<div class="post">
-  <div class="post-header">
-    <img src="https://picsum.photos/40?6">
-    <strong>ali</strong>
-  </div>
-  <img src="https://picsum.photos/400/300?7">
-  <div class="actions">
-    <span onclick="like(this)">❤️</span>
-    <span>💬</span>
-    <span>📤</span>
-  </div>
-  <div class="likes">Beğeni: <span>0</span></div>
-  <p>Güzel bir gün 😎</p>
+<nav>
+  🏠
+  🔍
+  ➕
+  ❤
+  👤
+</nav>
+
 </div>
 
-<footer>
-  <span>🏠</span>
-  <span>🔍</span>
-  <span>➕</span>
-  <span>❤️</span>
-  <span>👤</span>
-</footer>
+<!-- STORY MODAL -->
+<div id="storyModal" onclick="closeStory()">
+  <img id="storyImg">
+</div>
 
 <script>
-  function like(el) {
-    const likes = el.parentElement.nextElementSibling.querySelector("span");
-    likes.textContent = Number(likes.textContent) + 1;
-  }
+function login(){
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").classList.remove("hidden");
+}
+
+function like(el){
+  el.classList.toggle("active");
+}
+
+function openStory(src){
+  document.getElementById("storyImg").src=src;
+  document.getElementById("storyModal").style.display="flex";
+}
+
+function closeStory(){
+  document.getElementById("storyModal").style.display="none";
+}
 </script>
 
 </body>
