@@ -2,89 +2,155 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>InstFatih</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <title>InstFatih</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
       background: #000;
       color: #fff;
+      font-family: Arial, sans-serif;
     }
 
     header {
-      text-align: center;
       padding: 15px;
-      font-size: 24px;
+      text-align: center;
+      font-size: 22px;
       border-bottom: 1px solid #222;
     }
 
     .stories {
       display: flex;
-      gap: 12px;
-      padding: 10px;
+      gap: 15px;
+      padding: 15px;
       overflow-x: auto;
       border-bottom: 1px solid #222;
     }
 
     .story {
       text-align: center;
-      font-size: 12px;
+      font-size: 13px;
     }
 
     .story img {
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      border: 2px solid #ff004f;
-      display: block;
-      margin-bottom: 5px;
+      border: 3px solid #ff0050;
     }
 
     .post {
-      padding: 10px;
+      padding: 15px;
       border-bottom: 1px solid #222;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .post-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
     }
 
     .post img {
       width: 100%;
-      border-radius: 5px;
-      margin-top: 8px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 15px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .likes {
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #000;
+      border-top: 1px solid #222;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      font-size: 22px;
     }
   </style>
 </head>
-
 <body>
 
-  <header>📸 InstFatih</header>
+<header>📸 InstFatih</header>
 
-  <div class="stories">
-    <div class="story">
-      <img src="https://via.placeholder.com/60">
-      fatih
-    </div>
-    <div class="story">
-      <img src="https://via.placeholder.com/60">
-      ali
-    </div>
-    <div class="story">
-      <img src="https://via.placeholder.com/60">
-      ayşe
-    </div>
+<div class="stories">
+  <div class="story">
+    <img src="https://picsum.photos/60?1">
+    <div>fatih</div>
   </div>
+  <div class="story">
+    <img src="https://picsum.photos/60?2">
+    <div>ali</div>
+  </div>
+  <div class="story">
+    <img src="https://picsum.photos/60?3">
+    <div>ayşe</div>
+  </div>
+</div>
 
-  <div class="post">
+<div class="post">
+  <div class="post-header">
+    <img src="https://picsum.photos/40?4">
     <strong>fatih</strong>
-    <img src="https://via.placeholder.com/400x300">
-    <p>İlk gönderim 🚀</p>
   </div>
+  <img src="https://picsum.photos/400/300?5">
+  <div class="actions">
+    <span onclick="like(this)">❤️</span>
+    <span>💬</span>
+    <span>📤</span>
+  </div>
+  <div class="likes">Beğeni: <span>0</span></div>
+  <p>İlk gönderim 🚀</p>
+</div>
 
-  <div class="post">
+<div class="post">
+  <div class="post-header">
+    <img src="https://picsum.photos/40?6">
     <strong>ali</strong>
-    <img src="https://via.placeholder.com/400x300">
-    <p>Güzel bir gün 😎</p>
   </div>
+  <img src="https://picsum.photos/400/300?7">
+  <div class="actions">
+    <span onclick="like(this)">❤️</span>
+    <span>💬</span>
+    <span>📤</span>
+  </div>
+  <div class="likes">Beğeni: <span>0</span></div>
+  <p>Güzel bir gün 😎</p>
+</div>
+
+<footer>
+  <span>🏠</span>
+  <span>🔍</span>
+  <span>➕</span>
+  <span>❤️</span>
+  <span>👤</span>
+</footer>
+
+<script>
+  function like(el) {
+    const likes = el.parentElement.nextElementSibling.querySelector("span");
+    likes.textContent = Number(likes.textContent) + 1;
+  }
+</script>
 
 </body>
 </html>
