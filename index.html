@@ -13,116 +13,189 @@ header{text-align:center;padding:15px;font-size:24px;border-bottom:1px solid #22
 
 /* STORIES */
 .stories{display:flex;gap:12px;padding:10px;overflow-x:auto}
-.story{text-align:center;cursor:pointer}
+.story{text-align:center}
 .story img{
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  border:3px solid #ff0050;
-  object-fit:cover;
+  width:70px;height:70px;border-radius:50%;
+  border:3px solid #ff0050;object-fit:cover
 }
 
 /* POST */
 .post{padding:10px;border-bottom:1px solid #222}
 .post img{width:100%;border-radius:10px}
-.actions{display:flex;gap:15px;font-size:22px;margin-top:5px}
+.actions{display:flex;gap:15px;font-size:22px;margin:8px 0}
 .like{cursor:pointer}
 .like.active{color:red}
 
 /* NAV */
 nav{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:#000;
-  border-top:1px solid #222;
-  display:flex;
-  justify-content:space-around;
-  padding:10px;
-  font-size:22px;
+  position:fixed;bottom:0;width:100%;
+  background:#000;border-top:1px solid #222;
+  display:flex;justify-content:space-around;
+  padding:10px;font-size:22px
 }
+nav span{cursor:pointer}
 
-/* STORY MODAL */
-#storyModal{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
+/* MODALS */
+.modal{
+  position:fixed;inset:0;background:#000;
+  display:none;justify-content:center;
+  align-items:center;z-index:9999
 }
-#storyModal img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
+.modal img{width:100%;height:100%;object-fit:contain}
+.close{position:absolute;top:20px;right:20px;font-size:28px}
+
+/* COMMENT */
+#commentBox{
+  position:fixed;bottom:0;width:100%;
+  background:#111;padding:10px;display:none
 }
-#storyClose{
-  position:absolute;
-  top:20px;
-  right:20px;
-  font-size:28px;
-  cursor:pointer;
+#commentBox input{width:80%;padding:8px}
+#commentBox button{padding:8px}
+
+/* PROFILE */
+#profile{
+  display:none;padding:20px;text-align:center
+}
+#profile img{width:100px;height:100px;border-radius:50%}
+
+/* ADD POST */
+#addPost{
+  display:none;padding:20px
 }
 </style>
 </head>
-
 <body>
 
 <header>📸 InstFatih</header>
 
+<!-- STORIES -->
 <div class="stories">
-  <div class="story" onclick="openStory('https://picsum.photos/800/1400')">
-    <img src="https://picsum.photos/100?1">
-    <small>fatih</small>
+  <div class="story" onclick="openStory(0)">
+    <img src="https://picsum.photos/100?1"><small>fatih</small>
   </div>
-  <div class="story" onclick="openStory('https://picsum.photos/801/1400')">
-    <img src="https://picsum.photos/100?2">
-    <small>ali</small>
+  <div class="story" onclick="openStory(1)">
+    <img src="https://picsum.photos/100?2"><small>ali</small>
   </div>
-  <div class="story" onclick="openStory('https://picsum.photos/802/1400')">
-    <img src="https://picsum.photos/100?3">
-    <small>ayşe</small>
+  <div class="story" onclick="openStory(2)">
+    <img src="https://picsum.photos/100?3"><small>ayşe</small>
   </div>
 </div>
 
+<!-- FEED -->
 <div id="feed">
   <div class="post">
-    <img src="https://picsum.photos/600/600">
+    <img src="https://picsum.photos/600/600?4">
     <div class="actions">
       <span class="like" onclick="like(this)">❤</span>
-      💬 📦
+      <span onclick="openComment()">💬</span>
     </div>
     <p>İlk gönderim 🚀</p>
   </div>
 </div>
 
-<nav>
-  🏠
-  🔍
-  ➕
-  ❤
-  👤
-</nav>
+<!-- PROFILE -->
+<div id="profile">
+  <img src="https://picsum.photos/200">
+  <h2>fatih</h2>
+  <p>Gönderi: 1 | Takipçi: 120 | Takip: 80</p>
+</div>
+
+<!-- ADD POST -->
+<div id="addPost">
+  <h3>Yeni Gönderi</h3>
+  <input id="imgUrl" placeholder="Resim URL" style="width:100%;padding:10px"><br><br>
+  <button onclick="addPost()">Paylaş</button>
+</div>
 
 <!-- STORY MODAL -->
-<div id="storyModal">
-  <div id="storyClose" onclick="closeStory()">✕</div>
+<div class="modal" id="storyModal">
+  <span class="close" onclick="closeStory()">✕</span>
   <img id="storyImg">
 </div>
 
+<!-- COMMENT -->
+<div id="commentBox">
+  <input placeholder="Yorum yaz...">
+  <button onclick="closeComment()">Gönder</button>
+</div>
+
+<!-- NAV -->
+<nav>
+  <span onclick="showFeed()">🏠</span>
+  <span onclick="alert('Arama yakında')">🔍</span>
+  <span onclick="showAdd()">➕</span>
+  <span onclick="alert('Beğeniler yakında')">❤</span>
+  <span onclick="showProfile()">👤</span>
+</nav>
+
 <script>
-function like(el){
-  el.classList.toggle("active");
+let stories=[
+"https://picsum.photos/800/1400?1",
+"https://picsum.photos/800/1400?2",
+"https://picsum.photos/800/1400?3"
+];
+let storyIndex=0,storyTimer;
+
+function like(el){el.classList.toggle("active");}
+
+function openStory(i){
+ storyIndex=i;
+ document.getElementById("storyModal").style.display="flex";
+ playStory();
 }
 
-function openStory(src){
-  document.getElementById("storyImg").src = src;
-  document.getElementById("storyModal").style.display = "flex";
+function playStory(){
+ document.getElementById("storyImg").src=stories[storyIndex];
+ storyTimer=setTimeout(()=>{
+  storyIndex++;
+  if(storyIndex<stories.length) playStory();
+  else closeStory();
+ },2000);
 }
 
 function closeStory(){
-  document.getElementById("storyModal").style.display = "none";
+ clearTimeout(storyTimer);
+ document.getElementById("storyModal").style.display="none";
+}
+
+function openComment(){
+ document.getElementById("commentBox").style.display="flex";
+}
+
+function closeComment(){
+ document.getElementById("commentBox").style.display="none";
+}
+
+function showProfile(){
+ hideAll();document.getElementById("profile").style.display="block";
+}
+
+function showAdd(){
+ hideAll();document.getElementById("addPost").style.display="block";
+}
+
+function showFeed(){
+ hideAll();document.getElementById("feed").style.display="block";
+}
+
+function hideAll(){
+ document.getElementById("feed").style.display="none";
+ document.getElementById("profile").style.display="none";
+ document.getElementById("addPost").style.display="none";
+}
+
+function addPost(){
+ let url=document.getElementById("imgUrl").value;
+ if(!url)return;
+ let post=document.createElement("div");
+ post.className="post";
+ post.innerHTML=`<img src="${url}">
+ <div class="actions">
+ <span class="like" onclick="like(this)">❤</span>
+ <span onclick="openComment()">💬</span>
+ </div><p>Yeni gönderi ✨</p>`;
+ document.getElementById("feed").prepend(post);
+ showFeed();
 }
 </script>
 
