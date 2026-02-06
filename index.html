@@ -1,97 +1,55 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<title>Mini Instagram</title>
-<style>
-body{font-family:Arial;background:#fafafa;margin:0}
-.box{max-width:400px;margin:30px auto;background:#fff;padding:15px;border-radius:8px}
-input,button{width:100%;padding:10px;margin:6px 0}
-button{background:#3897f0;color:#fff;border:none;cursor:pointer}
-.post{border:1px solid #ddd;margin:10px 0;border-radius:6px}
-.post img{width:100%}
-.post p{padding:10px;margin:0}
-.hidden{display:none}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instafatih</title>
+
+  <!-- Font + İkon -->
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="box" id="loginBox">
-<h3>Giriş</h3>
-<input id="loginUser" placeholder="Kullanıcı adı">
-<input id="loginPass" type="password" placeholder="Şifre">
-<button onclick="doLogin()">Giriş Yap</button>
-<p id="msg"></p>
+<!-- ÜST BAR -->
+<header class="topbar">
+  <span class="logo">Instagram</span>
+  <div class="top-icons">
+    <i class='bx bx-plus-square'></i>
+    <i class='bx bx-heart'></i>
+    <i class='bx bx-paper-plane'></i>
+    <button id="themeBtn">🌙</button>
+  </div>
+</header>
+
+<!-- HİKAYELER -->
+<section class="stories">
+  <div class="story">Sen</div>
+  <div class="story">ali</div>
+  <div class="story">ayşe</div>
+  <div class="story">mehmet</div>
+</section>
+
+<!-- AKIŞ -->
+<main class="feed" id="feed"></main>
+
+<!-- ALT MENÜ -->
+<nav class="bottom">
+  <i class='bx bx-home'></i>
+  <i class='bx bx-search'></i>
+  <i class='bx bx-plus-circle' onclick="openAdmin()"></i>
+  <i class='bx bx-movie-play'></i>
+  <i class='bx bx-user'></i>
+</nav>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="admin hidden">
+  <h3>Yeni Post</h3>
+  <input id="imgUrl" placeholder="Resim URL">
+  <textarea id="caption" placeholder="Açıklama"></textarea>
+  <button onclick="addPost()">Paylaş</button>
 </div>
 
-<div class="box hidden" id="adminBox">
-<h3>Admin Panel</h3>
-<input id="postText" placeholder="Açıklama">
-<input type="file" id="postImg">
-<button onclick="addPost()">Paylaş</button>
-<button onclick="logout()">Çıkış</button>
-</div>
-
-<div class="box hidden" id="feedBox">
-<h3>Ana Sayfa</h3>
-<div id="posts"></div>
-<button onclick="logout()">Çıkış</button>
-</div>
-
-<script>
-const USERS = {
-  admin: { pass: "123456", role: "admin" },
-  user:  { pass: "123456", role: "user" }
-};
-
-function doLogin(){
-  const u = document.getElementById("loginUser").value;
-  const p = document.getElementById("loginPass").value;
-  if(USERS[u] && USERS[u].pass === p){
-    document.getElementById("loginBox").classList.add("hidden");
-    document.getElementById("feedBox").classList.remove("hidden");
-    if(USERS[u].role === "admin"){
-      document.getElementById("adminBox").classList.remove("hidden");
-    }
-    loadPosts();
-  }else{
-    document.getElementById("msg").innerText = "Hatalı giriş";
-  }
-}
-
-function addPost(){
-  const text = document.getElementById("postText").value;
-  const file = document.getElementById("postImg").files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(){
-    const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-    posts.unshift({text:text,img:reader.result});
-    localStorage.setItem("posts", JSON.stringify(posts));
-    document.getElementById("postText").value="";
-    document.getElementById("postImg").value="";
-    loadPosts();
-  }
-  reader.readAsDataURL(file);
-}
-
-function loadPosts(){
-  const wrap = document.getElementById("posts");
-  wrap.innerHTML="";
-  const data = JSON.parse(localStorage.getItem("posts") || "[]");
-  data.forEach(p=>{
-    wrap.innerHTML += `
-      <div class="post">
-        <img src="${p.img}">
-        <p>${p.text}</p>
-      </div>`;
-  });
-}
-
-function logout(){
-  location.reload();
-}
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
