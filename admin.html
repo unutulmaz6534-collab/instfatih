@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div id="loginBox">
+  <h2>Admin Giriş</h2>
+  <input id="username" placeholder="Kullanıcı adı">
+  <input id="password" type="password" placeholder="Şifre">
+  <button onclick="login()">Giriş</button>
+  <p id="error"></p>
+</div>
+
+<div id="panel" style="display:none;">
+  <h2>Admin Paneli</h2>
+  <div id="postList"></div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
