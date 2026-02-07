@@ -1,6 +1,53 @@
 body {
-  background-color: black;
-  color: white;
   margin: 0;
+  background: #000;
+  color: #fff;
   font-family: Arial, sans-serif;
+}
+
+/* ÜST BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #222;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.top-icons i {
+  font-size: 22px;
+  margin-left: 12px;
+  cursor: pointer;
+}
+
+#themeBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* HİKAYELER */
+.stories {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  overflow-x: auto;
+  border-bottom: 1px solid #222;
+}
+
+.story {
+  min-width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #feda75, #d62976, #962fbf);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
 }
