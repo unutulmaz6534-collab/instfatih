@@ -2,116 +2,92 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Instafatih - Giriş</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>Giriş Yap</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: white;
+      font-family: Arial;
+      background: #f2f2f2;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
     .box {
-      background: #1e1e1e;
-      padding: 25px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 350px;
-    }
-    h2 {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
       text-align: center;
-      margin-bottom: 20px;
     }
     input {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      border: none;
+      padding: 8px;
+      margin: 6px 0;
     }
     button {
       width: 100%;
       padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #4caf50;
-      color: white;
-      font-size: 16px;
+      margin-top: 6px;
       cursor: pointer;
-      margin-bottom: 10px;
-    }
-    button.secondary {
-      background: #2196f3;
-    }
-    #msg {
-      text-align: center;
-      margin-top: 10px;
-      color: #ff5252;
     }
   </style>
 </head>
 <body>
 
-  <div class="box">
-    <h2>Instafatih</h2>
+<div class="box">
+  <h3>Giriş / Kayıt</h3>
+  <input id="email" type="email" placeholder="E-posta">
+  <input id="password" type="password" placeholder="Şifre">
 
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Şifre">
+  <button onclick="register()">Kayıt Ol</button>
+  <button onclick="login()">Giriş Yap</button>
 
-    <button onclick="login()">Giriş Yap</button>
-    <button class="secondary" onclick="register()">Kayıt Ol</button>
+  <p id="msg"></p>
+</div>
 
-    <p id="msg"></p>
-  </div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+  from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+    authDomain: "instafatih-28213.firebaseapp.com",
+    projectId: "instafatih-28213",
+    storageBucket: "instafatih-28213.firebasestorage.app",
+    messagingSenderId: "885847505120",
+    appId: "1:885847505120:web:06e60cf83d229e84a37885"
+  };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
-      authDomain: "instafatih-28213.firebaseapp.com",
-      projectId: "instafatih-28213",
-      storageBucket: "instafatih-28213.firebasestorage.app",
-      messagingSenderId: "885847505120",
-      appId: "1:885847505120:web:06e60cf83d229e84a37885"
-    };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  window.register = function () {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
 
-    window.login = function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then(() => {
+        document.getElementById("msg").innerText = "✅ Kayıt başarılı";
+      })
+      .catch(err => {
+        document.getElementById("msg").innerText = err.message;
+      });
+  };
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          document.getElementById("msg").style.color = "#4caf50";
-          document.getElementById("msg").innerText = "Giriş başarılı 🎉";
-        })
-        .catch(err => {
-          document.getElementById("msg").innerText = err.message;
-        });
-    };
+  window.login = function () {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
 
-    window.register = function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          document.getElementById("msg").style.color = "#4caf50";
-          document.getElementById("msg").innerText = "Kayıt başarılı ✅";
-        })
-        .catch(err => {
-          document.getElementById("msg").innerText = err.message;
-        });
-    };
-  </script>
+    signInWithEmailAndPassword(auth, email, pass)
+      .then(() => {
+        document.getElementById("msg").innerText = "🎉 Giriş başarılı";
+      })
+      .catch(err => {
+        document.getElementById("msg").innerText = err.message;
+      });
+  };
+</script>
 
 </body>
 </html>
