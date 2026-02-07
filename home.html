@@ -1,124 +1,108 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>InstFatih - Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>InstFatih</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, getDocs,
+  updateDoc, doc, arrayUnion, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
-      authDomain: "instafatih-28213.firebaseapp.com",
-      projectId: "instafatih-28213",
-      storageBucket: "instafatih-28213.firebasestorage.app",
-      messagingSenderId: "885847505120",
-      appId: "1:885847505120:web:06e60cf83d229e84a37885"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+  authDomain: "instafatih-28213.firebaseapp.com",
+  projectId: "instafatih-28213",
+  storageBucket: "instafatih-28213.firebasestorage.app",
+  messagingSenderId: "885847505120",
+  appId: "1:885847505120:web:06e60cf83d229e84a37885"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    window.logout = async () => {
-      await signOut(auth);
-      window.location.href = "index.html";
-    };
+window.logout = async () => {
+  await signOut(auth);
+  location.href = "index.html";
+};
 
-    window.paylas = async () => {
-      const text = document.getElementById("postText").value;
-      if (text.trim() === "") {
-        alert("Bir şey yaz");
-        return;
-      }
+window.paylas = async () => {
+  const text = postText.value;
+  if (!text) return alert("Bir şey yaz");
 
-      await addDoc(collection(db, "posts"), {
-        text: text,
-        time: Date.now()
-      });
+  await addDoc(collection(db, "posts"), {
+    text,
+    likes: 0,
+    comments: [],
+    time: Date.now(),
+    user: auth.currentUser.email
+  });
 
-      document.getElementById("postText").value = "";
-      listele();
-    };
+  postText.value = "";
+  yukle();
+};
 
-    async function listele() {
-      const alan = document.getElementById("posts");
-      alan.innerHTML = "";
+window.like = async (id, likes) => {
+  await updateDoc(doc(db, "posts", id), { likes: likes + 1 });
+  yukle();
+};
 
-      const q = query(collection(db, "posts"), orderBy("time", "desc"));
-      const snap = await getDocs(q);
+window.comment = async (id) => {
+  const c = prompt("Yorum yaz");
+  if (!c) return;
+  await updateDoc(doc(db, "posts", id), {
+    comments: arrayUnion(c)
+  });
+  yukle();
+};
 
-      snap.forEach(doc => {
-        const div = document.createElement("div");
-        div.className = "post";
-        div.innerText = doc.data().text;
-        alan.appendChild(div);
-      });
-    }
+async function yukle() {
+  posts.innerHTML = "";
+  const q = query(collection(db, "posts"), orderBy("time", "desc"));
+  const snap = await getDocs(q);
 
-    window.onload = listele;
-  </script>
+  snap.forEach(d => {
+    const p = d.data();
+    posts.innerHTML += `
+      <div class="post">
+        <b onclick="location.href='profile.html?u=${p.user}'">${p.user}</b>
+        <p>${p.text}</p>
+        ❤️ ${p.likes}
+        <button onclick="like('${d.id}', ${p.likes})">Beğen</button>
+        <button onclick="comment('${d.id}')">Yorum</button>
+        <div>${(p.comments||[]).join("<br>")}</div>
+      </div>
+    `;
+  });
+}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-    }
+window.onload = yukle;
+</script>
 
-    header {
-      background: #000;
-      color: #fff;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .box {
-      background: #fff;
-      margin: 15px;
-      padding: 15px;
-      border-radius: 8px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 80px;
-      padding: 10px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-    }
-
-    .post {
-      background: #fff;
-      margin: 15px;
-      padding: 15px;
-      border-radius: 8px;
-    }
-  </style>
+<style>
+body{font-family:Arial;background:#eee;margin:0}
+header{background:#000;color:#fff;padding:10px;display:flex;justify-content:space-between}
+.post{background:#fff;margin:10px;padding:10px;border-radius:8px}
+textarea,button{width:100%;margin-top:5px}
+</style>
 </head>
 
 <body>
-
 <header>
-  <b>InstFatih</b>
-  <button onclick="logout()">Çıkış</button>
+<b>InstFatih</b>
+<button onclick="logout()">Çıkış</button>
 </header>
 
-<div class="box">
-  <textarea id="postText" placeholder="Ne düşünüyorsun?"></textarea>
-  <button onclick="paylas()">Paylaş</button>
+<div class="post">
+<textarea id="postText" placeholder="Ne düşünüyorsun?"></textarea>
+<button onclick="paylas()">Paylaş</button>
 </div>
 
 <div id="posts"></div>
-
 </body>
 </html>
