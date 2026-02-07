@@ -3,15 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>InstFatih</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h2>Storyler</h2>
 
-<div class="stories">
-  <div class="story" onclick="openStory('https://picsum.photos/400/700?1')">Ayşe</div>
-  <div class="story" onclick="openStory('https://picsum.photos/400/700?2')">Mehmet</div>
+<div class="stories" id="stories"></div>
+
+<!-- ADMIN -->
+<div id="adminLogin">
+  <h3>Admin Giriş</h3>
+  <input type="password" id="adminPass" placeholder="Admin Şifre">
+  <button onclick="login()">Giriş</button>
+</div>
+
+<div id="adminPanel" style="display:none">
+  <h3>Story Ekle</h3>
+  <input id="storyUrl" placeholder="Story Resim URL">
+  <button onclick="addStory()">Story Ekle</button>
 </div>
 
 <!-- STORY MODAL -->
