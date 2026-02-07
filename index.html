@@ -8,8 +8,7 @@
 body {
   margin:0;
   background:#fafafa;
-  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color:#262626;
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
 }
 #app {
   max-width:420px;
@@ -22,10 +21,21 @@ body {
   border-right:1px solid #dbdbdb;
 }
 header {
-  padding:12px;
-  text-align:center;
-  font-weight:600;
+  padding:8px;
   border-bottom:1px solid #dbdbdb;
+  text-align:center;
+}
+header button {
+  border:none;
+  background:#eee;
+  padding:6px 10px;
+  margin:0 5px;
+  border-radius:12px;
+  cursor:pointer;
+}
+header .active {
+  background:#3797f0;
+  color:white;
 }
 #messages {
   flex:1;
@@ -34,53 +44,37 @@ header {
   background:#fafafa;
 }
 .msg {
-  max-width:80%;
-  margin-bottom:8px;
+  max-width:75%;
   padding:8px 12px;
+  margin-bottom:6px;
   border-radius:18px;
   font-size:14px;
-}
-.other {
-  background:#e4e6eb;
-  align-self:flex-start;
 }
 .me {
   background:#3797f0;
   color:white;
-  align-self:flex-end;
+  margin-left:auto;
 }
-.name {
-  font-size:11px;
-  opacity:.7;
-  margin-bottom:2px;
-}
-.actions {
-  font-size:12px;
-  margin-top:4px;
-}
-.actions span {
-  cursor:pointer;
-  margin-right:10px;
+.other {
+  background:#e4e6eb;
 }
 footer {
-  padding:8px;
   border-top:1px solid #dbdbdb;
+  padding:8px;
   display:flex;
-  background:white;
 }
 footer input {
   flex:1;
   border:1px solid #dbdbdb;
   border-radius:20px;
   padding:8px 12px;
-  font-size:14px;
 }
 footer button {
-  margin-left:6px;
-  background:none;
   border:none;
+  background:none;
   color:#3797f0;
   font-weight:600;
+  margin-left:8px;
   cursor:pointer;
 }
 </style>
@@ -89,8 +83,13 @@ footer button {
 <body>
 
 <div id="app">
-  <header>Mesajlar</header>
+  <header>
+    <button id="A" class="active" onclick="setUser('A')">Kullanıcı A</button>
+    <button id="B" onclick="setUser('B')">Kullanıcı B</button>
+  </header>
+
   <div id="messages"></div>
+
   <footer>
     <input id="text" placeholder="Mesaj yaz...">
     <button onclick="send()">Gönder</button>
@@ -98,23 +97,24 @@ footer button {
 </div>
 
 <script>
-const username = "Kullanıcı#" + Math.floor(Math.random()*9000+1000);
+let currentUser = "A";
 let messages = JSON.parse(localStorage.getItem("chat")) || [];
+
+function setUser(u) {
+  currentUser = u;
+  document.getElementById("A").classList.remove("active");
+  document.getElementById("B").classList.remove("active");
+  document.getElementById(u).classList.add("active");
+  render();
+}
 
 function render() {
   const box = document.getElementById("messages");
   box.innerHTML = "";
-  messages.forEach((m,i) => {
+  messages.forEach(m => {
     const div = document.createElement("div");
-    div.className = "msg " + (m.user === username ? "me" : "other");
-    div.innerHTML = `
-      <div class="name">${m.user}</div>
-      <div>${m.text}</div>
-      <div class="actions">
-        <span onclick="like(${i})">❤️ ${m.likes}</span>
-        ${m.user === username ? `<span onclick="del(${i})">Sil</span>` : ``}
-      </div>
-    `;
+    div.className = "msg " + (m.user === currentUser ? "me" : "other");
+    div.innerText = m.text;
     box.appendChild(div);
   });
   box.scrollTop = box.scrollHeight;
@@ -123,21 +123,9 @@ function render() {
 function send() {
   const text = document.getElementById("text").value.trim();
   if (!text) return;
-  messages.push({ user: username, text, likes:0 });
+  messages.push({ user: currentUser, text });
   localStorage.setItem("chat", JSON.stringify(messages));
   document.getElementById("text").value = "";
-  render();
-}
-
-function del(i) {
-  messages.splice(i,1);
-  localStorage.setItem("chat", JSON.stringify(messages));
-  render();
-}
-
-function like(i) {
-  messages[i].likes++;
-  localStorage.setItem("chat", JSON.stringify(messages));
   render();
 }
 
