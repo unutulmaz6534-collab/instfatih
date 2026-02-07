@@ -2,10 +2,9 @@ body {
   margin: 0;
   background: #000;
   color: #fff;
-  font-family: Arial, sans-serif;
+  font-family: Arial;
 }
 
-/* ÜST BAR */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -18,22 +17,15 @@ body {
   font-weight: bold;
 }
 
-.top-icons i {
-  font-size: 22px;
-  margin-left: 12px;
-}
-
-/* HİKAYELER */
 .stories {
   display: flex;
   gap: 12px;
-  padding: 12px;
-  overflow-x: auto;
+  padding: 10px;
 }
 
 .story {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: linear-gradient(45deg, orange, purple);
   display: flex;
@@ -41,25 +33,20 @@ body {
   justify-content: center;
 }
 
-/* ADMIN */
-#adminLogin {
+#adminLogin, .new-post {
   padding: 12px;
 }
 
-#adminLogin input {
+input, textarea, button {
   width: 100%;
   margin-bottom: 8px;
+  padding: 8px;
 }
 
-/* POST */
-.new-post {
-  padding: 12px;
-}
-
-.new-post input,
-.new-post textarea {
-  width: 100%;
-  margin-bottom: 8px;
+button {
+  background: red;
+  color: white;
+  border: none;
 }
 
 .post {
@@ -69,4 +56,13 @@ body {
 .post img {
   width: 100%;
   border-radius: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.actions span {
+  cursor: pointer;
 }
