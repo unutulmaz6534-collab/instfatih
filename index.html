@@ -1,109 +1,168 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Canlı Sohbet</title>
-  <style>
-    body {
-      background: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-    }
-    .msg {
-      margin-bottom: 8px;
-    }
-    .sender {
-      font-weight: bold;
-    }
-    #inputArea {
-      display: flex;
-      border-top: 1px solid #333;
-    }
-    input {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      outline: none;
-    }
-    button {
-      padding: 10px;
-      background: #1da1f2;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sohbet</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  padding: 10px;
+  background: #1f1f1f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#chat {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.message {
+  max-width: 70%;
+  margin: 6px 0;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.me {
+  background: #0a84ff;
+  margin-left: auto;
+  text-align: right;
+}
+
+.other {
+  background: #333;
+  margin-right: auto;
+}
+
+.time {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+footer {
+  display: flex;
+  padding: 10px;
+  background: #1f1f1f;
+}
+
+input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  margin-left: 5px;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.light {
+  background: #f5f5f5;
+  color: #000;
+}
+
+.light header,
+.light footer {
+  background: #ddd;
+}
+</style>
 </head>
+
 <body>
+<header>
+  <div id="user"></div>
+  <button onclick="toggleTheme()">🌙</button>
+</header>
 
-<div id="messages"></div>
+<div id="chat"></div>
 
-<div id="inputArea">
-  <input id="username" placeholder="Kullanıcı adı" />
-  <input id="messageInput" placeholder="Mesaj yaz..." />
-  <button onclick="sendMessage()">Gönder</button>
-</div>
+<footer>
+  <input id="text" placeholder="Mesaj yaz..." />
+  <button onclick="send()">➤</button>
+</footer>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } 
-  from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "API_KEYİN",
-    authDomain: "instafatih-28213.firebaseapp.com",
-    projectId: "instafatih-28213",
-    storageBucket: "instafatih-28213.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
-  };
+const firebaseConfig = {
+  apiKey: "API_KEY",
+  authDomain: "PROJECT.firebaseapp.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  const messagesRef = collection(db, "mesajlar");
+let username = localStorage.getItem("username");
+if (!username) {
+  username = prompt("Kullanıcı adın?");
+  localStorage.setItem("username", username);
+}
+document.getElementById("user").innerText = username;
 
-  const q = query(messagesRef, orderBy("zaman"));
+const chat = document.getElementById("chat");
 
-  onSnapshot(q, (snapshot) => {
-    const messagesDiv = document.getElementById("messages");
-    messagesDiv.innerHTML = "";
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      messagesDiv.innerHTML += `
-        <div class="msg">
-          <span class="sender">${data.gonderen}:</span>
-          ${data.metin}
-        </div>
-      `;
-    });
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+const q = query(collection(db, "mesajlar"), orderBy("zaman"));
+
+onSnapshot(q, (snap) => {
+  chat.innerHTML = "";
+  snap.forEach(docu => {
+    const d = docu.data();
+    const div = document.createElement("div");
+    div.className = "message " + (d.gonderen === username ? "me" : "other");
+    div.innerHTML = `
+      <b>${d.gonderen}</b><br>
+      ${d.metin}
+      <div class="time">${new Date(d.zaman).toLocaleTimeString()}</div>
+      ${d.gonderen === username ? `<button onclick="sil('${docu.id}')">🗑️</button>` : ""}
+    `;
+    chat.appendChild(div);
   });
+  chat.scrollTop = chat.scrollHeight;
+});
 
-  window.sendMessage = async () => {
-    const username = document.getElementById("username").value;
-    const text = document.getElementById("messageInput").value;
-    if (!username || !text) return;
+window.send = async () => {
+  const text = document.getElementById("text");
+  if (!text.value) return;
 
-    await addDoc(messagesRef, {
-      gonderen: username,
-      metin: text,
-      zaman: serverTimestamp()
-    });
+  await addDoc(collection(db, "mesajlar"), {
+    gonderen: username,
+    metin: text.value,
+    zaman: Date.now()
+  });
+  text.value = "";
+};
 
-    document.getElementById("messageInput").value = "";
-  };
+window.sil = async (id) => {
+  await deleteDoc(doc(db, "mesajlar", id));
+};
+
+window.toggleTheme = () => {
+  document.body.classList.toggle("light");
+};
 </script>
-
 </body>
 </html>
