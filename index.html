@@ -1,80 +1,108 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<title>InstaFatih Chat</title>
-<style>
-body { background:#000; color:#fff; font-family:Arial; margin:0; }
-#login, #chat { padding:15px; }
-input, button { width:100%; padding:10px; margin:5px 0; }
-button { background:#1da1f2; color:#fff; border:none; }
-#messages { height:60vh; overflow-y:auto; border:1px solid #333; padding:10px; }
-.msg { margin:5px 0; }
-.me { text-align:right; color:#1da1f2; }
-</style>
+  <meta charset="UTF-8" />
+  <title>Canlı Sohbet</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    .msg {
+      margin-bottom: 8px;
+    }
+    .sender {
+      font-weight: bold;
+    }
+    #inputArea {
+      display: flex;
+      border-top: 1px solid #333;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+    button {
+      padding: 10px;
+      background: #1da1f2;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-<div id="login">
-  <input id="username" placeholder="Kullanıcı adın">
-  <button onclick="login()">Giriş</button>
-</div>
+<div id="messages"></div>
 
-<div id="chat" style="display:none;">
-  <div id="messages"></div>
-  <input id="text" placeholder="Mesaj yaz">
-  <button onclick="send()">Gönder</button>
+<div id="inputArea">
+  <input id="username" placeholder="Kullanıcı adı" />
+  <input id="messageInput" placeholder="Mesaj yaz..." />
+  <button onclick="sendMessage()">Gönder</button>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } 
+  from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "API_KEYİN",
-  authDomain: "DOMAIN",
-  projectId: "PROJECT_ID"
-};
+  const firebaseConfig = {
+    apiKey: "API_KEYİN",
+    authDomain: "instafatih-28213.firebaseapp.com",
+    projectId: "instafatih-28213",
+    storageBucket: "instafatih-28213.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-let user = "";
+  const messagesRef = collection(db, "mesajlar");
 
-window.login = () => {
-  user = document.getElementById("username").value;
-  if (!user) return alert("İsim yaz");
-  document.getElementById("login").style.display = "none";
-  document.getElementById("chat").style.display = "block";
-  listen();
-};
+  const q = query(messagesRef, orderBy("zaman"));
 
-window.send = async () => {
-  const text = document.getElementById("text").value;
-  if (!text) return;
-  await addDoc(collection(db, "mesajlar"), {
-    gonderen: user,
-    metin: text,
-    zaman: Date.now()
-  });
-  document.getElementById("text").value = "";
-};
-
-function listen() {
-  const q = query(collection(db, "mesajlar"), orderBy("zaman"));
-  onSnapshot(q, snap => {
-    const box = document.getElementById("messages");
-    box.innerHTML = "";
-    snap.forEach(doc => {
-      const d = doc.data();
-      const div = document.createElement("div");
-      div.className = "msg" + (d.gonderen === user ? " me" : "");
-      div.textContent = d.gonderen + ": " + d.metin;
-      box.appendChild(div);
+  onSnapshot(q, (snapshot) => {
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML = "";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      messagesDiv.innerHTML += `
+        <div class="msg">
+          <span class="sender">${data.gonderen}:</span>
+          ${data.metin}
+        </div>
+      `;
     });
-    box.scrollTop = box.scrollHeight;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
   });
-}
+
+  window.sendMessage = async () => {
+    const username = document.getElementById("username").value;
+    const text = document.getElementById("messageInput").value;
+    if (!username || !text) return;
+
+    await addDoc(messagesRef, {
+      gonderen: username,
+      metin: text,
+      zaman: serverTimestamp()
+    });
+
+    document.getElementById("messageInput").value = "";
+  };
 </script>
 
 </body>
