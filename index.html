@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Insta Chat Full Paket</title>
+<title>DM Chat</title>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -23,128 +23,100 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 👤 Kullanıcı
-const user = prompt("Kullanıcı adın:");
-const userRef = doc(db, "kullanicilar", user);
+// 👤 Kullanıcılar
+const me = prompt("Kullanıcı adın:");
+const other = prompt("Mesaj göndereceğin kişi:");
 
-// 🟢 Online yap
-await setDoc(userRef, { online: true }, { merge: true });
-window.onbeforeunload = () => {
-  setDoc(userRef, { online: false }, { merge: true });
-};
+// 🔐 ODA ID (iki isim alfabetik)
+const room =
+  [me, other].sort().join("_");
 
-const mesajlarRef = collection(db, "mesajlar");
+// 🟢 Online durumu
+const myRef = doc(db, "users", me);
+await setDoc(myRef, { online: true }, { merge: true });
+window.onbeforeunload = () =>
+  setDoc(myRef, { online: false }, { merge: true });
 
 // ✉️ Mesaj gönder
-window.gonder = async () => {
-  const input = document.getElementById("mesaj");
+window.send = async () => {
+  const input = document.getElementById("msg");
   if (!input.value.trim()) return;
 
-  await addDoc(mesajlarRef, {
-    gonderen: user,
-    metin: input.value,
-    createdAt: serverTimestamp(),
-    okundu: false
+  await addDoc(collection(db, "messages"), {
+    room,
+    from: me,
+    to: other,
+    text: input.value,
+    time: serverTimestamp(),
+    read: false
   });
 
   input.value = "";
 };
 
-// ✍️ Yazıyor…
-let typingTimeout;
-window.yaziyor = async () => {
-  await setDoc(userRef, { yaziyor: true }, { merge: true });
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => {
-    setDoc(userRef, { yaziyor: false }, { merge: true });
-  }, 1000);
-};
+// 🔄 Mesajları dinle (SADECE BU ODA)
+const q = query(
+  collection(db, "messages"),
+  orderBy("time")
+);
 
-// 🔄 Mesajları dinle
-const q = query(mesajlarRef, orderBy("createdAt"));
 onSnapshot(q, (snap) => {
-  const alan = document.getElementById("mesajlar");
-  alan.innerHTML = "";
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
 
   snap.forEach(async (d) => {
     const m = d.data();
-    const div = document.createElement("div");
-    div.className = m.gonderen === user ? "ben" : "o";
+    if (m.room !== room) return;
 
-    let tik = "";
-    if (m.gonderen === user) {
-      tik = m.okundu ? "✓✓" : "✓";
+    const div = document.createElement("div");
+    div.className = m.from === me ? "me" : "other";
+
+    let seen = "";
+    if (m.from === me) {
+      seen = m.read ? "✓✓" : "✓";
     }
 
-    div.innerHTML = `
-      <span>${m.metin}</span>
-      <small>${tik}</small>
-    `;
-    alan.appendChild(div);
+    div.innerHTML = `<span>${m.text}</span><small>${seen}</small>`;
+    box.appendChild(div);
 
     // 👀 Okundu
-    if (m.gonderen !== user && !m.okundu) {
-      await updateDoc(doc(db, "mesajlar", d.id), { okundu: true });
+    if (m.to === me && !m.read) {
+      await updateDoc(doc(db, "messages", d.id), {
+        read: true
+      });
     }
   });
 
-  alan.scrollTop = alan.scrollHeight;
-});
-
-// 🟢 Online + Yazıyor durumu
-onSnapshot(collection(db, "kullanicilar"), (snap) => {
-  let durum = "";
-  snap.forEach(d => {
-    if (d.id !== user) {
-      if (d.data().yaziyor) durum = "Yazıyor...";
-      else if (d.data().online) durum = "Online";
-    }
-  });
-  document.getElementById("durum").innerText = durum;
+  box.scrollTop = box.scrollHeight;
 });
 </script>
 
 <style>
 body {
-  background:#fafafa;
   font-family: Arial;
+  background:#f0f2f5;
 }
 #chat {
-  width: 360px;
-  margin: 40px auto;
+  width:360px;
+  margin:40px auto;
   background:white;
   border-radius:12px;
-  box-shadow:0 0 10px #ccc;
 }
-#header {
-  padding:10px;
-  border-bottom:1px solid #ddd;
-}
-#durum {
-  font-size:12px;
-  color:green;
-}
-#mesajlar {
+#messages {
   height:350px;
   overflow-y:auto;
   padding:10px;
 }
-.ben {
-  text-align:right;
-  margin:5px;
-}
-.o {
-  text-align:left;
-  margin:5px;
-}
-.ben span {
+.me { text-align:right; margin:6px; }
+.other { text-align:left; margin:6px; }
+.me span {
   background:#3797f0;
   color:white;
   padding:6px 10px;
   border-radius:15px;
   display:inline-block;
 }
-.o span {
+.other span {
   background:#eee;
   padding:6px 10px;
   border-radius:15px;
@@ -152,9 +124,9 @@ body {
 }
 small {
   font-size:10px;
-  margin-left:5px;
+  margin-left:4px;
 }
-#alt {
+#bottom {
   display:flex;
   border-top:1px solid #ddd;
 }
@@ -174,16 +146,10 @@ button {
 
 <body>
 <div id="chat">
-  <div id="header">
-    <b>Chat</b>
-    <div id="durum"></div>
-  </div>
-
-  <div id="mesajlar"></div>
-
-  <div id="alt">
-    <input id="mesaj" oninput="yaziyor()" placeholder="Mesaj yaz...">
-    <button onclick="gonder()">Gönder</button>
+  <div id="messages"></div>
+  <div id="bottom">
+    <input id="msg" placeholder="Mesaj yaz...">
+    <button onclick="send()">Gönder</button>
   </div>
 </div>
 </body>
