@@ -2,135 +2,112 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Grup Sohbet</title>
-
+<title>Sohbet</title>
 <style>
 body{
   margin:0;
-  background:#fafafa;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f0f2f5;
 }
-#app{
-  max-width:420px;
+#chat{
+  max-width:500px;
   margin:auto;
   height:100vh;
   display:flex;
   flex-direction:column;
-  background:#fff;
-  border-left:1px solid #dbdbdb;
-  border-right:1px solid #dbdbdb;
-}
-header{
-  padding:10px;
-  text-align:center;
-  font-weight:600;
-  border-bottom:1px solid #dbdbdb;
+  background:white;
 }
 #messages{
   flex:1;
   padding:10px;
   overflow-y:auto;
-  background:#fafafa;
 }
 .msg{
-  max-width:75%;
   padding:8px 12px;
-  margin-bottom:6px;
-  border-radius:18px;
+  margin:5px 0;
+  border-radius:16px;
+  max-width:75%;
   font-size:14px;
 }
 .me{
   background:#3797f0;
-  color:#fff;
+  color:white;
   margin-left:auto;
 }
 .other{
   background:#e4e6eb;
 }
-.name{
-  font-size:11px;
-  opacity:.6;
-}
-footer{
+#sendBox{
   display:flex;
-  padding:8px;
-  border-top:1px solid #dbdbdb;
+  border-top:1px solid #ccc;
 }
-footer input{
+#sendBox input{
   flex:1;
-  border:1px solid #dbdbdb;
-  border-radius:20px;
-  padding:8px 12px;
-}
-footer button{
+  padding:10px;
   border:none;
-  background:none;
-  color:#3797f0;
-  font-weight:600;
-  margin-left:8px;
+  font-size:14px;
+}
+#sendBox button{
+  border:none;
+  background:#3797f0;
+  color:white;
+  padding:0 20px;
   cursor:pointer;
 }
 </style>
 </head>
 
 <body>
-
-<div id="app">
-  <header>Grup Sohbet</header>
+<div id="chat">
   <div id="messages"></div>
-  <footer>
+  <div id="sendBox">
     <input id="text" placeholder="Mesaj yaz...">
     <button onclick="send()">Gönder</button>
-  </footer>
+  </div>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
-// 🔴 BURAYI KENDİ FIREBASE BİLGİLERİNLE DOLDUR
-const firebaseConfig = {
+var firebaseConfig = {
   apiKey: "API_KEY",
   authDomain: "PROJECT_ID.firebaseapp.com",
   databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "PROJECT_ID",
+  projectId: "PROJECT_ID"
 };
-
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 
-const username = "Kullanıcı" + Math.floor(Math.random()*9000+1000);
-const messagesRef = db.ref("messages");
+var db = firebase.database();
+var messagesRef = db.ref("chat");
 
-messagesRef.on("child_added", snap => {
-  const m = snap.val();
+var username = "User" + Math.floor(Math.random()*10000);
+
+messagesRef.limitToLast(100).on("child_added", function(snapshot){
+  var m = snapshot.val();
   addMessage(m.user, m.text);
 });
 
 function send(){
-  const text = document.getElementById("text").value.trim();
-  if(!text) return;
+  var input = document.getElementById("text");
+  if(input.value.trim() === "") return;
+
   messagesRef.push({
     user: username,
-    text: text,
-    time: Date.now()
+    text: input.value
   });
-  document.getElementById("text").value="";
+  input.value = "";
 }
 
 function addMessage(user,text){
-  const div = document.createElement("div");
-  div.className = "msg " + (user===username ? "me":"other");
-  div.innerHTML = `
-    <div class="name">${user}</div>
-    <div>${text}</div>
-  `;
+  var div = document.createElement("div");
+  div.className = "msg " + (user === username ? "me" : "other");
+  div.innerText = text;
   document.getElementById("messages").appendChild(div);
   document.getElementById("messages").scrollTop =
     document.getElementById("messages").scrollHeight;
 }
 </script>
-
 </body>
 </html>
