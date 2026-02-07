@@ -6,82 +6,110 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+*{box-sizing:border-box}
 body{
   margin:0;
+  font-family:Arial, sans-serif;
   background:#000;
   color:#fff;
-  font-family:Arial, sans-serif;
 }
 
-/* TOP BAR */
-.topbar{
+/* HEADER */
+.header{
   padding:15px;
   text-align:center;
-  font-size:20px;
   font-weight:bold;
+  font-size:20px;
   border-bottom:1px solid #222;
 }
 
-/* STORIES */
-.stories{
+/* LOGIN */
+#login{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.login-box{
+  width:90%;
+  max-width:300px;
+}
+.login-box input, .login-box button{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border:none;
+  border-radius:6px;
+}
+.login-box button{
+  background:#3897f0;
+  color:#fff;
+  font-weight:bold;
+}
+
+/* APP */
+#app{display:none}
+
+/* STORY */
+.story-bar{
   display:flex;
   overflow-x:auto;
   padding:10px;
-  gap:12px;
+  border-bottom:1px solid #222;
 }
 .story{
+  margin-right:10px;
   text-align:center;
 }
 .story img{
-  width:65px;
-  height:65px;
+  width:60px;
+  height:60px;
   border-radius:50%;
-  border:3px solid #ff0055;
-}
-.story span{
-  font-size:12px;
+  border:2px solid #ff004f;
 }
 
 /* POST */
 .post{
-  border-top:1px solid #222;
+  border-bottom:1px solid #222;
+}
+.post .username{
   padding:10px;
+  font-weight:bold;
 }
 .post img{
   width:100%;
-  border-radius:8px;
 }
-.post-actions{
-  margin-top:8px;
-  font-size:20px;
+.actions{
+  padding:10px;
+  font-size:22px;
 }
-.username{
-  font-weight:bold;
-  margin-bottom:5px;
+.actions span{
+  margin-right:15px;
+  cursor:pointer;
 }
 
 /* DM */
-.dm-box{
+.dm{
   position:fixed;
   bottom:0;
+  left:0;
   width:100%;
+  display:flex;
   background:#111;
   padding:10px;
-  display:flex;
 }
-.dm-box input{
+.dm input{
   flex:1;
   padding:10px;
-  border-radius:20px;
   border:none;
-  outline:none;
+  border-radius:20px;
 }
-.dm-box button{
-  margin-left:8px;
+.dm button{
+  margin-left:10px;
   padding:10px 15px;
   border:none;
   border-radius:50%;
-  background:#0095f6;
+  background:#3897f0;
   color:#fff;
 }
 </style>
@@ -89,122 +117,88 @@ body{
 
 <body>
 
-<div class="topbar">InstFatih</div>
-
-<!-- STORIES -->
-<div class="stories">
-  <div class="story">
-    <img src="https://picsum.photos/200?1">
-    <span>fatih</span>
-  </div>
-  <div class="story">
-    <img src="https://picsum.photos/200?2">
-    <span>alex</span>
-  </div>
-  <div class="story">
-    <img src="https://picsum.photos/200?3">
-    <span>emre</span>
-  </div>
-  <div class="story">
-    <img src="https://picsum.photos/200?4">
-    <span>zeynep</span>
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <input id="username" placeholder="Kullanıcı adı">
+    <button onclick="login()">Giriş Yap</button>
   </div>
 </div>
 
-<!-- POST 1 -->
-<div class="post">
-  <div class="username">fatih</div>
-  <img src="https://picsum.photos/600/600?random=10">
-  <div class="post-actions">❤️ 💬 ✈️</div>
+<!-- APP -->
+<div id="app">
+  <div class="header">InstFatih</div>
+
+  <!-- STORIES -->
+  <div class="story-bar">
+    <div class="story">
+      <img src="https://picsum.photos/200?1">
+      <div>fatih</div>
+    </div>
+    <div class="story">
+      <img src="https://picsum.photos/200?2">
+      <div>zeynep</div>
+    </div>
+    <div class="story">
+      <img src="https://picsum.photos/200?3">
+      <div>alex</div>
+    </div>
+  </div>
+
+  <!-- POSTS -->
+  <div class="post">
+    <div class="username">fatih</div>
+    <img src="https://picsum.photos/600/600?10">
+    <div class="actions">
+      <span onclick="like(this)">❤️</span>
+      <span>💬</span>
+      <span>✈️</span>
+    </div>
+  </div>
+
+  <div class="post">
+    <div class="username">alex</div>
+    <img src="https://picsum.photos/600/600?20">
+    <div class="actions">
+      <span onclick="like(this)">❤️</span>
+      <span>💬</span>
+      <span>✈️</span>
+    </div>
+  </div>
+
+  <!-- DM -->
+  <div class="dm">
+    <input id="msg" placeholder="Mesaj yaz...">
+    <button onclick="send()">➤</button>
+  </div>
 </div>
 
-<!-- POST 2 -->
-<div class="post">
-  <div class="username">alex</div>
-  <img src="https://picsum.photos/600/600?random=20">
-  <div class="post-actions">❤️ 💬 ✈️</div>
-</div>
+<script>
+function login(){
+  const u=document.getElementById("username").value;
+  if(!u) return alert("Kullanıcı adı gir");
+  localStorage.setItem("user",u);
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+}
 
-<!-- DM -->
-<div class="dm-box">
-  <input type="text" placeholder="Mesaj yaz...">
-  <button>➤</button>
-</div>
+if(localStorage.getItem("user")){
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+}
 
-<!-- AUTH + CHAT -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+function like(el){
+  el.innerText="❤️";
+}
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
-  authDomain: "instafatih-28213.firebaseapp.com",
-  projectId: "instafatih-28213",
-  storageBucket: "instafatih-28213.firebasestorage.app",
-  messagingSenderId: "885847505120",
-  appId: "1:885847505120:web:06e60cf83d229e84a37885"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// UI
-document.body.insertAdjacentHTML("beforeend", `
-<div id="authBox" style="position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999">
-  <h2>Giriş / Kayıt</h2>
-  <input id="email" placeholder="email" style="margin:5px">
-  <input id="pass" type="password" placeholder="şifre" style="margin:5px">
-  <button id="login">Giriş</button>
-  <button id="register">Kayıt Ol</button>
-</div>
-
-<div id="chatBox" style="position:fixed;bottom:60px;left:0;right:0;background:#111;color:#fff;padding:10px">
-  <div id="messages" style="max-height:200px;overflow:auto"></div>
-  <input id="msg" placeholder="Mesaj yaz..." style="width:80%">
-  <button id="send">Gönder</button>
-</div>
-`);
-
-document.getElementById("register").onclick = () => {
-  createUserWithEmailAndPassword(auth,
-    email.value,
-    pass.value
-  );
-};
-
-document.getElementById("login").onclick = () => {
-  signInWithEmailAndPassword(auth,
-    email.value,
-    pass.value
-  );
-};
-
-onAuthStateChanged(auth, user => {
-  if (user) {
-    authBox.style.display = "none";
-
-    const q = query(collection(db, "messages"), orderBy("time"));
-    onSnapshot(q, snap => {
-      messages.innerHTML = "";
-      snap.forEach(d => {
-        messages.innerHTML += `<div><b>${d.data().user}</b>: ${d.data().text}</div>`;
-      });
-    });
-
-    send.onclick = async () => {
-      if (msg.value.trim() !== "") {
-        await addDoc(collection(db, "messages"), {
-          text: msg.value,
-          user: user.email,
-          time: Date.now()
-        });
-        msg.value = "";
-      }
-    };
+function send(){
+  const m=document.getElementById("msg");
+  if(m.value){
+    alert("Mesaj gönderildi: "+m.value);
+    m.value="";
   }
-});
+}
 </script>
+
 </body>
 </html>
