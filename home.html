@@ -1,107 +1,74 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>InstFatih - Home</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-body{
-  font-family: Arial;
-  background:#f2f2f2;
-  margin:0;
-}
-.container{
-  max-width:500px;
-  margin:auto;
-  padding:15px;
-}
-.post-box{
-  background:#fff;
-  padding:15px;
-  border-radius:8px;
-  margin-bottom:15px;
-}
-input,button{
-  width:100%;
-  padding:10px;
-  margin-bottom:8px;
-}
-img{
-  width:100%;
-  border-radius:6px;
-}
-.like{
-  cursor:pointer;
-  color:#e74c3c;
-  font-size:18px;
-}
+body{font-family:Arial;background:#f2f2f2;margin:0}
+.container{max-width:500px;margin:auto;padding:10px}
+.post{background:#fff;padding:10px;margin-bottom:10px;border-radius:6px}
+img{width:100%}
+.like{color:red;cursor:pointer}
+.comment{font-size:14px}
 </style>
 </head>
 <body>
 
 <div class="container">
-
-  <div class="post-box">
-    <input id="imgUrl" placeholder="Resim URL">
-    <button onclick="share()">Paylaş</button>
-  </div>
-
+  <input id="url" placeholder="Resim URL">
+  <button onclick="share()">Paylaş</button>
   <div id="posts"></div>
-
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
   authDomain: "instafatih-28213.firebaseapp.com",
-  projectId: "instafatih-28213",
-  storageBucket: "instafatih-28213.firebasestorage.app",
-  messagingSenderId: "885847505120",
-  appId: "1:885847505120:web:06e60cf83d229e84a37885"
+  projectId: "instafatih-28213"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-window.share = async function(){
-  const url = document.getElementById("imgUrl").value;
-  if(!url) return alert("URL gir");
-
+window.share = async ()=>{
   await addDoc(collection(db,"posts"),{
-    url:url,
+    url:url.value,
     likes:0,
-    time:Date.now()
+    comments:[]
   });
-
-  document.getElementById("imgUrl").value="";
+  url.value="";
 }
-
-const postArea = document.getElementById("posts");
 
 onSnapshot(collection(db,"posts"), snap=>{
-  postArea.innerHTML="";
-  snap.forEach(docu=>{
-    const p = docu.data();
-    postArea.innerHTML += `
-      <div class="post-box">
+  posts.innerHTML="";
+  snap.forEach(d=>{
+    const p=d.data();
+    posts.innerHTML+=`
+      <div class="post">
         <img src="${p.url}">
-        <div class="like" onclick="like('${docu.id}')">
-          ❤️ ${p.likes}
-        </div>
+        <div class="like" onclick="like('${d.id}')">❤️ ${p.likes}</div>
+        <input placeholder="Yorum yaz" onkeydown="if(event.key==='Enter')comment('${d.id}',this.value)">
+        ${p.comments.map(c=>`<div class="comment">${c}</div>`).join("")}
       </div>
     `;
-  });
-});
+  })
+})
 
-window.like = async function(id){
-  const ref = doc(db,"posts",id);
-  await updateDoc(ref,{likes:increment(1)});
+window.like = async id=>{
+  await updateDoc(doc(db,"posts",id),{likes:increment(1)});
+}
+
+window.comment = async (id,text)=>{
+  await updateDoc(doc(db,"posts",id),{
+    comments:arrayUnion(text)
+  });
 }
 </script>
-
 </body>
 </html>
