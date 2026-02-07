@@ -131,5 +131,80 @@ body{
   <button>➤</button>
 </div>
 
+<!-- AUTH + CHAT -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+  authDomain: "instafatih-28213.firebaseapp.com",
+  projectId: "instafatih-28213",
+  storageBucket: "instafatih-28213.firebasestorage.app",
+  messagingSenderId: "885847505120",
+  appId: "1:885847505120:web:06e60cf83d229e84a37885"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// UI
+document.body.insertAdjacentHTML("beforeend", `
+<div id="authBox" style="position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999">
+  <h2>Giriş / Kayıt</h2>
+  <input id="email" placeholder="email" style="margin:5px">
+  <input id="pass" type="password" placeholder="şifre" style="margin:5px">
+  <button id="login">Giriş</button>
+  <button id="register">Kayıt Ol</button>
+</div>
+
+<div id="chatBox" style="position:fixed;bottom:60px;left:0;right:0;background:#111;color:#fff;padding:10px">
+  <div id="messages" style="max-height:200px;overflow:auto"></div>
+  <input id="msg" placeholder="Mesaj yaz..." style="width:80%">
+  <button id="send">Gönder</button>
+</div>
+`);
+
+document.getElementById("register").onclick = () => {
+  createUserWithEmailAndPassword(auth,
+    email.value,
+    pass.value
+  );
+};
+
+document.getElementById("login").onclick = () => {
+  signInWithEmailAndPassword(auth,
+    email.value,
+    pass.value
+  );
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    authBox.style.display = "none";
+
+    const q = query(collection(db, "messages"), orderBy("time"));
+    onSnapshot(q, snap => {
+      messages.innerHTML = "";
+      snap.forEach(d => {
+        messages.innerHTML += `<div><b>${d.data().user}</b>: ${d.data().text}</div>`;
+      });
+    });
+
+    send.onclick = async () => {
+      if (msg.value.trim() !== "") {
+        await addDoc(collection(db, "messages"), {
+          text: msg.value,
+          user: user.email,
+          time: Date.now()
+        });
+        msg.value = "";
+      }
+    };
+  }
+});
+</script>
 </body>
 </html>
