@@ -200,5 +200,28 @@ function send(){
 }
 </script>
 
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+    authDomain: "instafatih-28213.firebaseapp.com",
+    projectId: "instafatih-28213",
+    storageBucket: "instafatih-28213.firebasestorage.app",
+    messagingSenderId: "885847505120",
+    appId: "1:885847505120:web:2212eff706545a2ca37885",
+    measurementId: "G-SG5WVJ565B"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
