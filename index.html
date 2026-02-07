@@ -2,43 +2,22 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Instafatih</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <title>InstFatih</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header class="topbar">
-  <span class="logo">Instagram</span>
-  <div class="top-icons">
-    <button id="themeBtn">🌙</button>
-  </div>
-</header>
+<h2>Storyler</h2>
 
-<section class="stories">
-  <div class="story">Sen</div>
-  <div class="story">Ali</div>
-  <div class="story">Ayşe</div>
-</section>
-
-<!-- ADMIN LOGIN -->
-<div id="adminLogin">
-  <h3>Admin Girişi</h3>
-  <input type="password" id="adminPass" placeholder="Admin Şifre">
-  <button onclick="login()">Giriş</button>
+<div class="stories">
+  <div class="story" onclick="openStory('https://picsum.photos/400/700?1')">Ayşe</div>
+  <div class="story" onclick="openStory('https://picsum.photos/400/700?2')">Mehmet</div>
 </div>
 
-<!-- NEW POST -->
-<section class="new-post" id="newPost" style="display:none">
-  <input id="imgUrl" placeholder="Resim URL">
-  <textarea id="desc" placeholder="Açıklama"></textarea>
-  <button onclick="addPost()">Paylaş</button>
-</section>
-
-<!-- FEED -->
-<section id="feed"></section>
+<!-- STORY MODAL -->
+<div id="storyModal" onclick="closeStory()">
+  <img id="storyImg">
+</div>
 
 <script src="app.js"></script>
 </body>
