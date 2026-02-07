@@ -2,45 +2,60 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Gece Sohbeti</title>
+<title>DM</title>
 
 <style>
 body {
   margin:0;
-  background:#0d0d0d;
-  font-family:Arial;
-  color:#fff;
+  background:#fafafa;
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color:#262626;
 }
 #app {
-  max-width:600px;
+  max-width:420px;
   margin:auto;
   height:100vh;
   display:flex;
   flex-direction:column;
+  background:white;
+  border-left:1px solid #dbdbdb;
+  border-right:1px solid #dbdbdb;
 }
 header {
-  padding:15px;
-  background:#111;
+  padding:12px;
   text-align:center;
-  font-weight:bold;
-  border-bottom:1px solid #222;
+  font-weight:600;
+  border-bottom:1px solid #dbdbdb;
 }
 #messages {
   flex:1;
   padding:10px;
   overflow-y:auto;
+  background:#fafafa;
 }
 .msg {
-  background:#1a1a1a;
+  max-width:80%;
   margin-bottom:8px;
-  padding:8px;
-  border-radius:8px;
+  padding:8px 12px;
+  border-radius:18px;
+  font-size:14px;
+}
+.other {
+  background:#e4e6eb;
+  align-self:flex-start;
+}
+.me {
+  background:#3797f0;
+  color:white;
+  align-self:flex-end;
 }
 .name {
-  font-size:12px;
-  color:#aaa;
+  font-size:11px;
+  opacity:.7;
+  margin-bottom:2px;
 }
 .actions {
+  font-size:12px;
   margin-top:4px;
 }
 .actions span {
@@ -48,25 +63,24 @@ header {
   margin-right:10px;
 }
 footer {
-  padding:10px;
-  background:#111;
+  padding:8px;
+  border-top:1px solid #dbdbdb;
   display:flex;
+  background:white;
 }
 footer input {
   flex:1;
-  background:#1a1a1a;
-  border:none;
-  color:white;
-  padding:8px;
-  border-radius:5px;
+  border:1px solid #dbdbdb;
+  border-radius:20px;
+  padding:8px 12px;
+  font-size:14px;
 }
 footer button {
   margin-left:6px;
-  background:#333;
-  color:white;
+  background:none;
   border:none;
-  padding:8px 12px;
-  border-radius:5px;
+  color:#3797f0;
+  font-weight:600;
   cursor:pointer;
 }
 </style>
@@ -75,7 +89,7 @@ footer button {
 <body>
 
 <div id="app">
-  <header>🖤 Gece Grup Sohbeti</header>
+  <header>Mesajlar</header>
   <div id="messages"></div>
   <footer>
     <input id="text" placeholder="Mesaj yaz...">
@@ -84,7 +98,7 @@ footer button {
 </div>
 
 <script>
-const username = prompt("Adın ne?") || "Misafir";
+const username = "Kullanıcı#" + Math.floor(Math.random()*9000+1000);
 let messages = JSON.parse(localStorage.getItem("chat")) || [];
 
 function render() {
@@ -92,13 +106,13 @@ function render() {
   box.innerHTML = "";
   messages.forEach((m,i) => {
     const div = document.createElement("div");
-    div.className = "msg";
+    div.className = "msg " + (m.user === username ? "me" : "other");
     div.innerHTML = `
       <div class="name">${m.user}</div>
       <div>${m.text}</div>
       <div class="actions">
         <span onclick="like(${i})">❤️ ${m.likes}</span>
-        <span onclick="del(${i})">🗑️</span>
+        ${m.user === username ? `<span onclick="del(${i})">Sil</span>` : ``}
       </div>
     `;
     box.appendChild(div);
