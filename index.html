@@ -1,82 +1,46 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>InstFatih - Giriş</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .box {
-      background: #fff;
-      padding: 25px;
-      width: 100%;
-      max-width: 350px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,.1);
-      text-align: center;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-    button {
-      background: #3897f0;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>InstFatih - Giriş</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:Arial;background:#f2f2f2;display:flex;justify-content:center;align-items:center;height:100vh}
+.box{background:#fff;padding:20px;width:300px;border-radius:8px}
+input,button{width:100%;padding:10px;margin-bottom:10px}
+</style>
 </head>
 <body>
 
-
-
 <div class="box">
-  <h2>InstFatih</h2>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Şifre">
-  <button onclick="login()">Giriş Yap</button>
+  <input id="email" placeholder="Email">
+  <input id="pass" type="password" placeholder="Şifre">
+  <button onclick="login()">Giriş</button>
+  <button onclick="register()">Kayıt</button>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
-    authDomain: "instafatih-28213.firebaseapp.com",
-    projectId: "instafatih-28213",
-    storageBucket: "instafatih-28213.firebasestorage.app",
-    messagingSenderId: "885847505120",
-    appId: "1:885847505120:web:06e60cf83d229e84a37885"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+  authDomain: "instafatih-28213.firebaseapp.com",
+  projectId: "instafatih-28213"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-  window.login = function () {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+window.login = async ()=>{
+  await signInWithEmailAndPassword(auth,email.value,pass.value);
+  location.href="home.html";
+}
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        alert("Giriş başarılı");
-        window.location.href = "home.html";
-      })
-      .catch(err => alert(err.message));
-  }
+window.register = async ()=>{
+  await createUserWithEmailAndPassword(auth,email.value,pass.value);
+  location.href="home.html";
+}
 </script>
-
 </body>
 </html>
