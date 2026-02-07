@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>DM + Arama</title>
+<title>DM + Arama (Fixli)</title>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -23,28 +23,38 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 👤 Kullanıcı
+// 👤 KULLANICI
 const me = prompt("Kullanıcı adın:");
-await setDoc(doc(db, "users", me), { username: me, online: true }, { merge: true });
+if (!me) location.reload();
+
+// 🔐 HER KULLANICIYI KAYDET (ASIL FIX BURASI)
+await setDoc(doc(db, "users", me.toLowerCase()), {
+  username: me,
+  search: me.toLowerCase(),
+  online: true
+}, { merge: true });
+
 window.onbeforeunload = () =>
-  setDoc(doc(db, "users", me), { online: false }, { merge: true });
+  setDoc(doc(db, "users", me.toLowerCase()), { online: false }, { merge: true });
 
 let currentChat = null;
 
-// 🔍 KULLANICI ARA
+// 🔍 KULLANICI ARA (FIXLI)
 window.searchUser = async () => {
-  const q = document.getElementById("search").value.toLowerCase();
+  const q = document.getElementById("search").value.toLowerCase().trim();
   const list = document.getElementById("dmList");
   list.innerHTML = "";
 
+  if (!q) return;
+
   const snap = await getDocs(collection(db, "users"));
   snap.forEach(d => {
-    const u = d.data().username;
-    if (u !== me && u.toLowerCase().includes(q)) {
+    const u = d.data();
+    if (u.search.includes(q) && u.username !== me) {
       const div = document.createElement("div");
       div.className = "dm";
-      div.innerText = u;
-      div.onclick = () => openChat(u);
+      div.innerText = u.username;
+      div.onclick = () => openChat(u.username);
       list.appendChild(div);
     }
   });
@@ -54,6 +64,7 @@ window.searchUser = async () => {
 window.openChat = (user) => {
   currentChat = user;
   document.getElementById("chatTitle").innerText = user;
+  document.getElementById("messages").innerHTML = "";
 };
 
 // ✉️ MESAJ GÖNDER
@@ -78,12 +89,12 @@ window.send = async () => {
 // 🔄 MESAJLARI DINLE
 onSnapshot(query(collection(db, "messages"), orderBy("time")), (snap) => {
   const box = document.getElementById("messages");
+  if (!currentChat) return;
+
   box.innerHTML = "";
 
   snap.forEach(async d => {
     const m = d.data();
-    if (!currentChat) return;
-
     if (
       (m.from === me && m.to === currentChat) ||
       (m.from === currentChat && m.to === me)
