@@ -2,13 +2,13 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>DM</title>
+<title>Grup Sohbet</title>
 
 <style>
 body {
   margin:0;
   background:#fafafa;
-  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
 }
 #app {
   max-width:420px;
@@ -16,7 +16,7 @@ body {
   height:100vh;
   display:flex;
   flex-direction:column;
-  background:white;
+  background:#fff;
   border-left:1px solid #dbdbdb;
   border-right:1px solid #dbdbdb;
 }
@@ -25,17 +25,10 @@ header {
   border-bottom:1px solid #dbdbdb;
   text-align:center;
 }
-header button {
-  border:none;
-  background:#eee;
-  padding:6px 10px;
-  margin:0 5px;
-  border-radius:12px;
-  cursor:pointer;
-}
-header .active {
-  background:#3797f0;
-  color:white;
+header select {
+  padding:6px;
+  border-radius:10px;
+  border:1px solid #dbdbdb;
 }
 #messages {
   flex:1;
@@ -49,14 +42,21 @@ header .active {
   margin-bottom:6px;
   border-radius:18px;
   font-size:14px;
+  clear:both;
 }
 .me {
   background:#3797f0;
-  color:white;
+  color:#fff;
   margin-left:auto;
 }
 .other {
   background:#e4e6eb;
+  color:#000;
+}
+.name {
+  font-size:11px;
+  opacity:.7;
+  margin-bottom:2px;
 }
 footer {
   border-top:1px solid #dbdbdb;
@@ -84,8 +84,12 @@ footer button {
 
 <div id="app">
   <header>
-    <button id="A" class="active" onclick="setUser('A')">Kullanıcı A</button>
-    <button id="B" onclick="setUser('B')">Kullanıcı B</button>
+    Aktif kullanıcı:
+    <select id="user" onchange="render()">
+      <option value="Ali">Ali</option>
+      <option value="Veli">Veli</option>
+      <option value="Ayşe">Ayşe</option>
+    </select>
   </header>
 
   <div id="messages"></div>
@@ -97,36 +101,35 @@ footer button {
 </div>
 
 <script>
-let currentUser = "A";
-let messages = JSON.parse(localStorage.getItem("chat")) || [];
-
-function setUser(u) {
-  currentUser = u;
-  document.getElementById("A").classList.remove("active");
-  document.getElementById("B").classList.remove("active");
-  document.getElementById(u).classList.add("active");
-  render();
-}
-
-function render() {
-  const box = document.getElementById("messages");
-  box.innerHTML = "";
-  messages.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "msg " + (m.user === currentUser ? "me" : "other");
-    div.innerText = m.text;
-    box.appendChild(div);
-  });
-  box.scrollTop = box.scrollHeight;
-}
+let messages = JSON.parse(localStorage.getItem("groupChat")) || [];
 
 function send() {
   const text = document.getElementById("text").value.trim();
   if (!text) return;
-  messages.push({ user: currentUser, text });
-  localStorage.setItem("chat", JSON.stringify(messages));
+
+  const user = document.getElementById("user").value;
+  messages.push({ user, text });
+  localStorage.setItem("groupChat", JSON.stringify(messages));
   document.getElementById("text").value = "";
   render();
+}
+
+function render() {
+  const currentUser = document.getElementById("user").value;
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
+
+  messages.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "msg " + (m.user === currentUser ? "me" : "other");
+    div.innerHTML = `
+      <div class="name">${m.user}</div>
+      <div>${m.text}</div>
+    `;
+    box.appendChild(div);
+  });
+
+  box.scrollTop = box.scrollHeight;
 }
 
 render();
