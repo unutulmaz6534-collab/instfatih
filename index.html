@@ -1,46 +1,37 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Instafatih</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ICON -->
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ÜST BAR -->
 <header class="topbar">
   <span class="logo">Instagram</span>
   <div class="top-icons">
-    <i class='bx bx-heart'></i>
-    <i class='bx bx-paper-plane'></i>
     <button id="themeBtn">🌙</button>
   </div>
 </header>
 
-<!-- HİKAYELER -->
 <section class="stories">
   <div class="story">Sen</div>
   <div class="story">Ali</div>
   <div class="story">Ayşe</div>
-  <div class="story">Mehmet</div>
 </section>
 
-<!-- ADMIN GİRİŞ -->
+<!-- ADMIN LOGIN -->
 <div id="adminLogin">
   <h3>Admin Girişi</h3>
   <input type="password" id="adminPass" placeholder="Admin Şifre">
   <button onclick="login()">Giriş</button>
 </div>
 
-<!-- YENİ POST -->
+<!-- NEW POST -->
 <section class="new-post" id="newPost" style="display:none">
-  <h2>Yeni Post</h2>
   <input id="imgUrl" placeholder="Resim URL">
   <textarea id="desc" placeholder="Açıklama"></textarea>
   <button onclick="addPost()">Paylaş</button>
