@@ -1,39 +1,42 @@
-// TEMA
-const btn = document.getElementById("themeBtn");
-btn.onclick = () => {
-  document.body.classList.toggle("light");
-  btn.textContent = document.body.classList.contains("light") ? "🌞" : "🌙";
-};
+// TEST
+console.log("app.js çalışıyor");
 
-// POST EKLE
+// POST EKLEME
 function addPost() {
-  const url = document.getElementById("imgUrl").value;
+  const imgUrl = document.getElementById("imgUrl").value;
   const desc = document.getElementById("desc").value;
 
-  if (!url) return alert("Resim URL gir");
+  if (!imgUrl) {
+    alert("Resim URL gir");
+    return;
+  }
+
+  const feed = document.getElementById("feed");
 
   const post = document.createElement("div");
   post.className = "post";
+
   post.innerHTML = `
-    <img src="${url}">
-    <div class="actions">
-      <span class="like" onclick="this.classList.toggle('active')">❤</span>
-    </div>
+    <img src="${imgUrl}">
     <p>${desc}</p>
   `;
 
-  document.getElementById("feed").prepend(post);
+  feed.prepend(post);
 
   document.getElementById("imgUrl").value = "";
   document.getElementById("desc").value = "";
 }
 
-// HİKAYE
+// HİKAYE AÇ
 function openStory(url) {
-  document.getElementById("storyImg").src = url;
-  document.getElementById("storyModal").style.display = "flex";
+  const modal = document.getElementById("storyModal");
+  const img = document.getElementById("storyImg");
+
+  img.src = url;
+  modal.style.display = "flex";
 }
 
+// HİKAYE KAPAT
 function closeStory() {
   document.getElementById("storyModal").style.display = "none";
 }
