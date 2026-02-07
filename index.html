@@ -2,13 +2,13 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>DM Listeli Chat</title>
+<title>DM + Arama</title>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore, collection, addDoc, serverTimestamp,
-  query, orderBy, onSnapshot, doc, updateDoc, setDoc
+  query, orderBy, onSnapshot, doc, updateDoc, setDoc, getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -25,37 +25,32 @@ const db = getFirestore(app);
 
 // 👤 Kullanıcı
 const me = prompt("Kullanıcı adın:");
-const myRef = doc(db, "users", me);
-await setDoc(myRef, { online: true }, { merge: true });
+await setDoc(doc(db, "users", me), { username: me, online: true }, { merge: true });
 window.onbeforeunload = () =>
-  setDoc(myRef, { online: false }, { merge: true });
+  setDoc(doc(db, "users", me), { online: false }, { merge: true });
 
 let currentChat = null;
 
-// 🔄 DM LISTESI
-onSnapshot(collection(db, "messages"), (snap) => {
+// 🔍 KULLANICI ARA
+window.searchUser = async () => {
+  const q = document.getElementById("search").value.toLowerCase();
   const list = document.getElementById("dmList");
   list.innerHTML = "";
-  const rooms = new Set();
 
+  const snap = await getDocs(collection(db, "users"));
   snap.forEach(d => {
-    const m = d.data();
-    if (m.from === me || m.to === me) {
-      const other = m.from === me ? m.to : m.from;
-      rooms.add(other);
+    const u = d.data().username;
+    if (u !== me && u.toLowerCase().includes(q)) {
+      const div = document.createElement("div");
+      div.className = "dm";
+      div.innerText = u;
+      div.onclick = () => openChat(u);
+      list.appendChild(div);
     }
   });
+};
 
-  rooms.forEach(user => {
-    const div = document.createElement("div");
-    div.className = "dm";
-    div.innerText = user;
-    div.onclick = () => openChat(user);
-    list.appendChild(div);
-  });
-});
-
-// 📩 CHAT AÇ
+// 📩 DM AÇ
 window.openChat = (user) => {
   currentChat = user;
   document.getElementById("chatTitle").innerText = user;
@@ -63,17 +58,15 @@ window.openChat = (user) => {
 
 // ✉️ MESAJ GÖNDER
 window.send = async () => {
-  if (!currentChat) return alert("Önce DM seç");
+  if (!currentChat) return alert("Önce kullanıcı seç");
 
   const input = document.getElementById("msg");
   if (!input.value.trim()) return;
 
-  const room = [me, currentChat].sort().join("_");
-
   await addDoc(collection(db, "messages"), {
-    room,
     from: me,
     to: currentChat,
+    room: [me, currentChat].sort().join("_"),
     text: input.value,
     time: serverTimestamp(),
     read: false
@@ -90,6 +83,7 @@ onSnapshot(query(collection(db, "messages"), orderBy("time")), (snap) => {
   snap.forEach(async d => {
     const m = d.data();
     if (!currentChat) return;
+
     if (
       (m.from === me && m.to === currentChat) ||
       (m.from === currentChat && m.to === me)
@@ -125,12 +119,17 @@ body {
   border-right:1px solid #ddd;
   background:#fafafa;
 }
-#dmList .dm {
+#search {
+  width:90%;
+  margin:10px;
+  padding:8px;
+}
+.dm {
   padding:15px;
   cursor:pointer;
   border-bottom:1px solid #eee;
 }
-#dmList .dm:hover {
+.dm:hover {
   background:#eee;
 }
 #chat {
@@ -185,7 +184,7 @@ button {
 <body>
 
 <div id="sidebar">
-  <h3 style="padding:10px">DM’ler</h3>
+  <input id="search" placeholder="Kullanıcı ara..." oninput="searchUser()">
   <div id="dmList"></div>
 </div>
 
