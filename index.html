@@ -3,31 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <title>InstFatih</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h2>Storyler</h2>
-
 <div class="stories" id="stories"></div>
 
-<!-- ADMIN -->
+<!-- ADMIN LOGIN -->
 <div id="adminLogin">
-  <h3>Admin Giriş</h3>
+  <h3>Admin Girişi</h3>
   <input type="password" id="adminPass" placeholder="Admin Şifre">
   <button onclick="login()">Giriş</button>
 </div>
 
+<!-- ADMIN PANEL -->
 <div id="adminPanel" style="display:none">
   <h3>Story Ekle</h3>
   <input id="storyUrl" placeholder="Story Resim URL">
   <button onclick="addStory()">Story Ekle</button>
 </div>
 
+<!-- FEED -->
+<h2>Postlar</h2>
+<section id="feed"></section>
+
 <!-- STORY MODAL -->
 <div id="storyModal" onclick="closeStory()">
-  <img id="storyImg">
+  <div class="storyBox">
+    <span id="storyViews"></span>
+    <img id="storyImg">
+    <button id="deleteStoryBtn" onclick="deleteStory()">Sil</button>
+  </div>
 </div>
 
 <script src="app.js"></script>
