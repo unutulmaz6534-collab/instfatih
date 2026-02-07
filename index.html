@@ -2,29 +2,34 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Sohbet</title>
+  <title>Canlı Sohbet</title>
   <style>
     body { font-family: Arial; background:#111; color:#fff; }
-    #chat { height: 300px; overflow-y: auto; border:1px solid #444; padding:10px; margin-bottom:10px; }
-    input, button { padding:10px; margin:5px 0; width:100%; }
+    #chat { max-width:600px; margin:20px auto; }
+    #messages { height:400px; overflow-y:auto; border:1px solid #444; padding:10px; }
     .msg { margin:5px 0; }
-    .user { font-weight:bold; color:#4caf50; }
+    .me { color:#4caf50; }
+    .other { color:#03a9f4; }
+    input, button { padding:10px; width:100%; margin-top:5px; }
   </style>
 </head>
 <body>
 
-<h2>Genel Sohbet</h2>
+<div id="chat">
+  <h2>🔥 Canlı Sohbet</h2>
 
-<input id="username" placeholder="Adın" />
-<div id="chat"></div>
-
-<input id="message" placeholder="Mesaj yaz..." />
-<button onclick="sendMessage()">Gönder</button>
+  <input id="username" placeholder="Adın" />
+  <div id="messages"></div>
+  <input id="text" placeholder="Mesaj yaz..." />
+  <button onclick="sendMessage()">Gönder</button>
+</div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } 
+  from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+  // 🔴 BURAYI KENDİ FİREBASE BİLGİNLE DEĞİŞTİR
   const firebaseConfig = {
     apiKey: "API_KEY",
     authDomain: "PROJECT_ID.firebaseapp.com",
@@ -37,34 +42,37 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const chatDiv = document.getElementById("chat");
+  const messagesDiv = document.getElementById("messages");
 
-  const q = query(collection(db, "messages"), orderBy("time"));
+  const q = query(
+    collection(db, "mesajlar"),
+    orderBy("createdAt")
+  );
 
-  onSnapshot(q, snapshot => {
-    chatDiv.innerHTML = "";
+  onSnapshot(q, (snapshot) => {
+    messagesDiv.innerHTML = "";
     snapshot.forEach(doc => {
-      const d = doc.data();
-      chatDiv.innerHTML += `
-        <div class="msg">
-          <span class="user">${d.user}:</span> ${d.text}
-        </div>`;
+      const data = doc.data();
+      const div = document.createElement("div");
+      div.className = "msg";
+      div.innerHTML = `<b>${data.gonderen}:</b> ${data.metin}`;
+      messagesDiv.appendChild(div);
     });
-    chatDiv.scrollTop = chatDiv.scrollHeight;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
   });
 
   window.sendMessage = async () => {
-    const user = document.getElementById("username").value;
-    const text = document.getElementById("message").value;
-    if (!user || !text) return;
+    const name = document.getElementById("username").value.trim();
+    const text = document.getElementById("text").value.trim();
+    if (!name || !text) return;
 
-    await addDoc(collection(db, "messages"), {
-      user: user,
-      text: text,
-      time: serverTimestamp()
+    await addDoc(collection(db, "mesajlar"), {
+      gonderen: name,
+      metin: text,
+      createdAt: serverTimestamp()
     });
 
-    document.getElementById("message").value = "";
+    document.getElementById("text").value = "";
   };
 </script>
 
