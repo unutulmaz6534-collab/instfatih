@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <title>InstaFatih Chat</title>
+
 <style>
 body {
   background:#000;
   color:#fff;
-  font-family: Arial;
+  font-family:Arial;
   margin:0;
 }
 #login, #chat {
@@ -20,7 +21,10 @@ input, button {
   border-radius:5px;
   border:none;
 }
-button { background:#1da1f2; color:#fff; }
+button {
+  background:#1da1f2;
+  color:#fff;
+}
 #messages {
   height:60vh;
   overflow-y:auto;
@@ -30,97 +34,29 @@ button { background:#1da1f2; color:#fff; }
 }
 .msg { margin:5px 0; }
 .me { text-align:right; color:#1da1f2; }
+.other { text-align:left; color:#fff; }
 </style>
 </head>
 
 <body>
 
 <div id="login">
-  <h2>Giriş Yap</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Şifre">
+  <h2>Kullanıcı Adı</h2>
+  <input id="username" placeholder="örnek: fatih">
   <button onclick="login()">Giriş</button>
 </div>
 
 <div id="chat" style="display:none">
-  <h3>Özel Sohbet</h3>
-  <input id="friendEmail" placeholder="Arkadaşının emaili">
+  <h3>Genel Sohbet</h3>
   <div id="messages"></div>
   <input id="messageInput" placeholder="Mesaj yaz">
   <button onclick="sendMessage()">Gönder</button>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
-  authDomain: "instafatih-28213.firebaseapp.com",
-  projectId: "instafatih-28213",
-  storageBucket: "instafatih-28213.firebasestorage.app",
-  messagingSenderId: "885847505120",
-  appId: "1:885847505120:web:06e60cf83d229e84a37885"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
-
-let currentUserEmail = "";
-let unsubscribe = null;
-
-window.login = async () => {
-  await signInWithEmailAndPassword(
-    auth,
-    email.value,
-    password.value
-  );
-};
-
-onAuthStateChanged(auth, user => {
-  if(user){
-    currentUserEmail = user.email;
-    login.style.display = "none";
-    chat.style.display = "block";
-  }
-});
-
-window.sendMessage = async () => {
-  const friend = friendEmail.value;
-  const roomId = [currentUserEmail, friend].sort().join("_");
-
-  await addDoc(collection(db, "chats", roomId, "messages"), {
-    from: currentUserEmail,
-    text: messageInput.value,
-    time: Date.now()
-  });
-
-  messageInput.value = "";
-};
-
-friendEmail.addEventListener("change", () => {
-  const roomId = [currentUserEmail, friendEmail.value].sort().join("_");
-  const q = query(
-    collection(db, "chats", roomId, "messages"),
-    orderBy("time")
-  );
-
-  if(unsubscribe) unsubscribe();
-
-  unsubscribe = onSnapshot(q, snap => {
-    messages.innerHTML = "";
-    snap.forEach(doc => {
-      const d = doc.data();
-      const div = document.createElement("div");
-      div.className = "msg " + (d.from === currentUserEmail ? "me" : "");
-      div.textContent = d.from + ": " + d.text;
-      messages.appendChild(div);
-    });
-  });
-});
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
