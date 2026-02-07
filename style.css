@@ -1,68 +1,38 @@
 body {
-  margin: 0;
-  background: #000;
-  color: #fff;
-  font-family: Arial;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid #222;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: bold;
+  font-family: Arial, sans-serif;
 }
 
 .stories {
   display: flex;
-  gap: 12px;
-  padding: 10px;
-}
-
-.story {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, orange, purple);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#adminLogin, .new-post {
-  padding: 12px;
-}
-
-input, textarea, button {
-  width: 100%;
-  margin-bottom: 8px;
-  padding: 8px;
-}
-
-button {
-  background: red;
-  color: white;
-  border: none;
-}
-
-.post {
-  margin: 12px;
-}
-
-.post img {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.actions {
-  display: flex;
   gap: 10px;
 }
 
-.actions span {
+.story {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: orange;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  font-weight: bold;
+}
+
+/* STORY MODAL */
+#storyModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: black;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+#storyImg {
+  width: 90%;
+  max-width: 400px;
+  border-radius: 10px;
 }
