@@ -1,44 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <title>Profil</title>
-</head>
-<body>
-
-<h2>Profilim</h2>
-<div id="myPosts"></div>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
- apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
- authDomain: "instafatih-28213.firebaseapp.com",
- projectId: "instafatih-28213"
+  apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+  authDomain: "instafatih-28213.firebaseapp.com",
+  projectId: "instafatih-28213"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
-auth.onAuthStateChanged(async user => {
- if (!user) return;
+const user = new URLSearchParams(location.search).get("u");
 
- const q = query(collection(db,"posts"), where("uid","==",user.uid));
- const snap = await getDocs(q);
-
- snap.forEach(doc => {
-   const p = doc.data();
-   document.getElementById("myPosts").innerHTML += `
-     <img src="${p.imgURL}" width="100"><br>
-     <p>${p.caption}</p><hr>
-   `;
- });
-});
+async function yukle(){
+  name.innerText = user;
+  const q = query(collection(db,"posts"), where("user","==",user));
+  const snap = await getDocs(q);
+  snap.forEach(d=>{
+    posts.innerHTML += `<div class="post">${d.data().text}</div>`;
+  });
+}
+window.onload = yukle;
 </script>
 
+<style>
+body{font-family:Arial;background:#eee}
+.post{background:#fff;margin:10px;padding:10px}
+</style>
+</head>
+
+<body>
+<h2 id="name"></h2>
+<div id="posts"></div>
 </body>
 </html>
