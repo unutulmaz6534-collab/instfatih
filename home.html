@@ -2,16 +2,58 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>InstFatih</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InstFatih - Home</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  font-family: Arial;
+  background:#f2f2f2;
+  margin:0;
+}
+.container{
+  max-width:500px;
+  margin:auto;
+  padding:15px;
+}
+.post-box{
+  background:#fff;
+  padding:15px;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin-bottom:8px;
+}
+img{
+  width:100%;
+  border-radius:6px;
+}
+.like{
+  cursor:pointer;
+  color:#e74c3c;
+  font-size:18px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="post-box">
+    <input id="imgUrl" placeholder="Resim URL">
+    <button onclick="share()">Paylaş</button>
+  </div>
+
+  <div id="posts"></div>
+
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import {
-  getFirestore, collection, addDoc, getDocs,
-  updateDoc, doc, arrayUnion, query, orderBy
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
@@ -23,86 +65,43 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.logout = async () => {
-  await signOut(auth);
-  location.href = "index.html";
-};
+window.share = async function(){
+  const url = document.getElementById("imgUrl").value;
+  if(!url) return alert("URL gir");
 
-window.paylas = async () => {
-  const text = postText.value;
-  if (!text) return alert("Bir şey yaz");
-
-  await addDoc(collection(db, "posts"), {
-    text,
-    likes: 0,
-    comments: [],
-    time: Date.now(),
-    user: auth.currentUser.email
+  await addDoc(collection(db,"posts"),{
+    url:url,
+    likes:0,
+    time:Date.now()
   });
 
-  postText.value = "";
-  yukle();
-};
+  document.getElementById("imgUrl").value="";
+}
 
-window.like = async (id, likes) => {
-  await updateDoc(doc(db, "posts", id), { likes: likes + 1 });
-  yukle();
-};
+const postArea = document.getElementById("posts");
 
-window.comment = async (id) => {
-  const c = prompt("Yorum yaz");
-  if (!c) return;
-  await updateDoc(doc(db, "posts", id), {
-    comments: arrayUnion(c)
-  });
-  yukle();
-};
-
-async function yukle() {
-  posts.innerHTML = "";
-  const q = query(collection(db, "posts"), orderBy("time", "desc"));
-  const snap = await getDocs(q);
-
-  snap.forEach(d => {
-    const p = d.data();
-    posts.innerHTML += `
-      <div class="post">
-        <b onclick="location.href='profile.html?u=${p.user}'">${p.user}</b>
-        <p>${p.text}</p>
-        ❤️ ${p.likes}
-        <button onclick="like('${d.id}', ${p.likes})">Beğen</button>
-        <button onclick="comment('${d.id}')">Yorum</button>
-        <div>${(p.comments||[]).join("<br>")}</div>
+onSnapshot(collection(db,"posts"), snap=>{
+  postArea.innerHTML="";
+  snap.forEach(docu=>{
+    const p = docu.data();
+    postArea.innerHTML += `
+      <div class="post-box">
+        <img src="${p.url}">
+        <div class="like" onclick="like('${docu.id}')">
+          ❤️ ${p.likes}
+        </div>
       </div>
     `;
   });
-}
+});
 
-window.onload = yukle;
+window.like = async function(id){
+  const ref = doc(db,"posts",id);
+  await updateDoc(ref,{likes:increment(1)});
+}
 </script>
 
-<style>
-body{font-family:Arial;background:#eee;margin:0}
-header{background:#000;color:#fff;padding:10px;display:flex;justify-content:space-between}
-.post{background:#fff;margin:10px;padding:10px;border-radius:8px}
-textarea,button{width:100%;margin-top:5px}
-</style>
-</head>
-
-<body>
-<header>
-<b>InstFatih</b>
-<button onclick="logout()">Çıkış</button>
-</header>
-
-<div class="post">
-<textarea id="postText" placeholder="Ne düşünüyorsun?"></textarea>
-<button onclick="paylas()">Paylaş</button>
-</div>
-
-<div id="posts"></div>
 </body>
 </html>
