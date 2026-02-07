@@ -24,38 +24,34 @@
       box-shadow: 0 0 10px rgba(0,0,0,.1);
       text-align: center;
     }
-    h2 { margin-bottom: 20px; }
-    input {
+    input, button {
       width: 100%;
       padding: 12px;
       margin-bottom: 10px;
       font-size: 16px;
     }
     button {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 8px;
-      cursor: pointer;
+      background: #3897f0;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
     }
   </style>
 </head>
-
 <body>
 
+
+
 <div class="box">
-  <h2>Giriş / Kayıt</h2>
-
-  <input type="email" id="email" placeholder="E-posta">
-  <input type="password" id="password" placeholder="Şifre">
-
-  <button onclick="kayitOl()">Kayıt Ol</button>
-  <button onclick="girisYap()">Giriş Yap</button>
+  <h2>InstFatih</h2>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Şifre">
+  <button onclick="login()">Giriş Yap</button>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
@@ -69,27 +65,17 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  window.kayitOl = function () {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        window.location.href = "home.html";
-      })
-      .catch(err => alert(err.message));
-  };
-
-  window.girisYap = function () {
+  window.login = function () {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
+        alert("Giriş başarılı");
         window.location.href = "home.html";
       })
       .catch(err => alert(err.message));
-  };
+  }
 </script>
 
 </body>
