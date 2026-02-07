@@ -1,37 +1,50 @@
-// TEST
-console.log("app.js çalışıyor");
+// POSTLAR
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
 
-// POST EKLEME
+// SAYFA AÇILINCA POSTLARI YÜKLE
+window.onload = () => {
+  renderPosts();
+};
+
+// POST EKLE
 function addPost() {
-  const imgUrl = document.getElementById("imgUrl").value;
+  const img = document.getElementById("imgUrl").value;
   const desc = document.getElementById("desc").value;
 
-  if (!imgUrl) {
+  if (!img) {
     alert("Resim URL gir");
     return;
   }
 
-  const feed = document.getElementById("feed");
-
-  const post = document.createElement("div");
-  post.className = "post";
-
-  post.innerHTML = `
-    <img src="${imgUrl}">
-    <p>${desc}</p>
-  `;
-
-  feed.prepend(post);
+  posts.unshift({ img, desc });
+  localStorage.setItem("posts", JSON.stringify(posts));
 
   document.getElementById("imgUrl").value = "";
   document.getElementById("desc").value = "";
+
+  renderPosts();
+}
+
+// POSTLARI EKRANA BAS
+function renderPosts() {
+  const feed = document.getElementById("feed");
+  feed.innerHTML = "";
+
+  posts.forEach(post => {
+    const div = document.createElement("div");
+    div.className = "post";
+    div.innerHTML = `
+      <img src="${post.img}">
+      <p>${post.desc || ""}</p>
+    `;
+    feed.appendChild(div);
+  });
 }
 
 // HİKAYE AÇ
 function openStory(url) {
   const modal = document.getElementById("storyModal");
   const img = document.getElementById("storyImg");
-
   img.src = url;
   modal.style.display = "flex";
 }
@@ -40,3 +53,11 @@ function openStory(url) {
 function closeStory() {
   document.getElementById("storyModal").style.display = "none";
 }
+
+// TEMA DEĞİŞTİR
+let dark = true;
+document.getElementById("themeBtn").onclick = () => {
+  dark = !dark;
+  document.body.style.background = dark ? "#000" : "#fff";
+  document.body.style.color = dark ? "#fff" : "#000";
+};
