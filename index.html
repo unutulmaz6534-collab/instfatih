@@ -1,43 +1,117 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>InstFatih</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Instafatih - Giriş</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #1e1e1e;
+      padding: 25px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 350px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #4caf50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    button.secondary {
+      background: #2196f3;
+    }
+    #msg {
+      text-align: center;
+      margin-top: 10px;
+      color: #ff5252;
+    }
+  </style>
 </head>
 <body>
 
-<h2>Storyler</h2>
-<div class="stories" id="stories"></div>
+  <div class="box">
+    <h2>Instafatih</h2>
 
-<!-- ADMIN LOGIN -->
-<div id="adminLogin">
-  <h3>Admin Girişi</h3>
-  <input type="password" id="adminPass" placeholder="Admin Şifre">
-  <button onclick="login()">Giriş</button>
-</div>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Şifre">
 
-<!-- ADMIN PANEL -->
-<div id="adminPanel" style="display:none">
-  <h3>Story Ekle</h3>
-  <input id="storyUrl" placeholder="Story Resim URL">
-  <button onclick="addStory()">Story Ekle</button>
-</div>
+    <button onclick="login()">Giriş Yap</button>
+    <button class="secondary" onclick="register()">Kayıt Ol</button>
 
-<!-- FEED -->
-<h2>Postlar</h2>
-<section id="feed"></section>
-
-<!-- STORY MODAL -->
-<div id="storyModal" onclick="closeStory()">
-  <div class="storyBox">
-    <span id="storyViews"></span>
-    <img id="storyImg">
-    <button id="deleteStoryBtn" onclick="deleteStory()">Sil</button>
+    <p id="msg"></p>
   </div>
-</div>
 
-<script src="app.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+      authDomain: "instafatih-28213.firebaseapp.com",
+      projectId: "instafatih-28213",
+      storageBucket: "instafatih-28213.firebasestorage.app",
+      messagingSenderId: "885847505120",
+      appId: "1:885847505120:web:06e60cf83d229e84a37885"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.login = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("msg").style.color = "#4caf50";
+          document.getElementById("msg").innerText = "Giriş başarılı 🎉";
+        })
+        .catch(err => {
+          document.getElementById("msg").innerText = err.message;
+        });
+    };
+
+    window.register = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("msg").style.color = "#4caf50";
+          document.getElementById("msg").innerText = "Kayıt başarılı ✅";
+        })
+        .catch(err => {
+          document.getElementById("msg").innerText = err.message;
+        });
+    };
+  </script>
+
 </body>
 </html>
