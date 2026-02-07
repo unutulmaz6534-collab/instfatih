@@ -1,8 +1,4 @@
-body {
-  margin: 0;
-  font-family: Arial;
-}
-
+/* STORY */
 .stories {
   display: flex;
   gap: 12px;
@@ -14,30 +10,42 @@ body {
   height: 70px;
   border-radius: 50%;
   background: linear-gradient(45deg, orange, purple);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: bold;
   cursor: pointer;
 }
 
-#adminLogin, #adminPanel {
-  padding: 10px;
-}
-
+/* STORY MODAL */
 #storyModal {
   display: none;
   position: fixed;
   inset: 0;
   background: black;
+  z-index: 9999;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+}
+
+.storyBox {
+  position: relative;
 }
 
 #storyImg {
-  width: 90%;
+  width: 90vw;
   max-width: 400px;
-  border-radius: 12px;
+  border-radius: 10px;
+}
+
+#storyViews {
+  position: absolute;
+  top: -30px;
+  color: white;
+}
+
+#deleteStoryBtn {
+  position: absolute;
+  bottom: -45px;
+  width: 100%;
 }
