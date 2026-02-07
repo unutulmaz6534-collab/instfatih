@@ -11,7 +11,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="dark">
 
   <!-- ÜST BAR -->
   <header class="topbar">
@@ -25,22 +25,27 @@
 
   <!-- HİKAYELER -->
   <section class="stories">
-    <div class="story">Sen</div>
-    <div class="story">Ali</div>
-    <div class="story">Ayşe</div>
-    <div class="story">Mehmet</div>
+    <div class="story" onclick="openStory('https://picsum.photos/400/700?1')">Sen</div>
+    <div class="story" onclick="openStory('https://picsum.photos/400/700?2')">Ali</div>
+    <div class="story" onclick="openStory('https://picsum.photos/400/700?3')">Ayşe</div>
+    <div class="story" onclick="openStory('https://picsum.photos/400/700?4')">Mehmet</div>
   </section>
 
   <!-- YENİ POST -->
   <section class="new-post">
-    <h3>Yeni Post</h3>
+    <h2>Yeni Post</h2>
     <input id="imgUrl" placeholder="Resim URL">
     <textarea id="desc" placeholder="Açıklama"></textarea>
-    <button onclick="paylas()">Paylaş</button>
+    <button onclick="addPost()">Paylaş</button>
   </section>
 
-  <!-- POSTLAR -->
-  <section id="posts"></section>
+  <!-- FEED -->
+  <section id="feed"></section>
+
+  <!-- HİKAYE MODAL -->
+  <div id="storyModal" onclick="closeStory()">
+    <img id="storyImg">
+  </div>
 
   <!-- JS -->
   <script src="app.js"></script>
