@@ -1,44 +1,11 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Profil</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
-  authDomain: "instafatih-28213.firebaseapp.com",
-  projectId: "instafatih-28213"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const user = new URLSearchParams(location.search).get("u");
-
-async function yukle(){
-  name.innerText = user;
-  const q = query(collection(db,"posts"), where("user","==",user));
-  const snap = await getDocs(q);
-  snap.forEach(d=>{
-    posts.innerHTML += `<div class="post">${d.data().text}</div>`;
-  });
-}
-window.onload = yukle;
-</script>
-
-<style>
-body{font-family:Arial;background:#eee}
-.post{background:#fff;margin:10px;padding:10px}
-</style>
 </head>
-
 <body>
-<h2 id="name"></h2>
-<div id="posts"></div>
+<h2>Profil Sayfası</h2>
+<p>(Sonraki adımda geliştireceğiz)</p>
 </body>
 </html>
