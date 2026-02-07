@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>InstFatih</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #fafafa;
+    }
+    header {
+      background: #000;
+      color: white;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .post {
+      background: white;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    button {
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <b>InstFatih</b>
+  <button onclick="logout()">Çıkış</button>
+</header>
+
+<div class="post">
+  <b>@fatih</b>
+  <p>İlk post 🎉</p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAuth, signOut, onAuthStateChanged } 
+  from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+    authDomain: "instafatih-28213.firebaseapp.com",
+    projectId: "instafatih-28213",
+    storageBucket: "instafatih-28213.firebasestorage.app",
+    messagingSenderId: "885847505120",
+    appId: "1:885847505120:web:06e60cf83d229e84a37885"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "index.html";
+    }
+  });
+
+  window.logout = function () {
+    signOut(auth).then(() => {
+      window.location.href = "index.html";
+    });
+  };
+</script>
+
+</body>
+</html>
