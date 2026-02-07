@@ -1,56 +1,48 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Instafatih</title>
 
-  <!-- Font + İkon -->
-  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <!-- İkonlar -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ÜST BAR -->
-<header class="topbar">
-  <span class="logo">Instagram</span>
-  <div class="top-icons">
-    <i class='bx bx-plus-square'></i>
-    <i class='bx bx-heart'></i>
-    <i class='bx bx-paper-plane'></i>
-    <button id="themeBtn">🌙</button>
-  </div>
-</header>
+  <!-- ÜST BAR -->
+  <header class="topbar">
+    <span class="logo">Instagram</span>
+    <div class="top-icons">
+      <i class='bx bx-heart'></i>
+      <i class='bx bx-paper-plane'></i>
+      <button id="themeBtn">🌙</button>
+    </div>
+  </header>
 
-<!-- HİKAYELER -->
-<section class="stories">
-  <div class="story">Sen</div>
-  <div class="story">ali</div>
-  <div class="story">ayşe</div>
-  <div class="story">mehmet</div>
-</section>
+  <!-- HİKAYELER -->
+  <section class="stories">
+    <div class="story">Sen</div>
+    <div class="story">Ali</div>
+    <div class="story">Ayşe</div>
+    <div class="story">Mehmet</div>
+  </section>
 
-<!-- AKIŞ -->
-<main class="feed" id="feed"></main>
+  <!-- YENİ POST -->
+  <section class="new-post">
+    <h3>Yeni Post</h3>
+    <input id="imgUrl" placeholder="Resim URL">
+    <textarea id="desc" placeholder="Açıklama"></textarea>
+    <button onclick="paylas()">Paylaş</button>
+  </section>
 
-<!-- ALT MENÜ -->
-<nav class="bottom">
-  <i class='bx bx-home'></i>
-  <i class='bx bx-search'></i>
-  <i class='bx bx-plus-circle' onclick="openAdmin()"></i>
-  <i class='bx bx-movie-play'></i>
-  <i class='bx bx-user'></i>
-</nav>
+  <!-- POSTLAR -->
+  <section id="posts"></section>
 
-<!-- ADMIN PANEL -->
-<div id="adminPanel" class="admin hidden">
-  <h3>Yeni Post</h3>
-  <input id="imgUrl" placeholder="Resim URL">
-  <textarea id="caption" placeholder="Açıklama"></textarea>
-  <button onclick="addPost()">Paylaş</button>
-</div>
-
-<script src="app.js"></script>
+  <!-- JS -->
+  <script src="app.js"></script>
 </body>
 </html>
-<div id="posts"></div>
