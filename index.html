@@ -2,8 +2,12 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Profil</title>
+  <title>InstFatih</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
 
   <style>
     body{
@@ -15,70 +19,94 @@
       align-items:center;
       height:100vh;
     }
-
-    .profile{
+    .box{
       background:#fff;
       width:100%;
       max-width:350px;
-      padding:20px;
-      border-radius:10px;
-      box-shadow:0 0 10px rgba(0,0,0,.1);
+      padding:25px;
+      border-radius:15px;
+      box-shadow:0 10px 30px rgba(0,0,0,.15);
       text-align:center;
     }
-
-    img{
-      width:120px;
-      height:120px;
-      border-radius:50%;
-      object-fit:cover;
-      margin-bottom:10px;
-    }
-
     h2{
-      margin:5px 0;
+      margin-bottom:20px;
     }
-
-    textarea{
+    input{
       width:100%;
-      height:60px;
-      padding:10px;
-      margin-top:10px;
-      resize:none;
-      font-size:14px;
+      padding:14px;
+      margin-bottom:12px;
+      border-radius:8px;
+      border:1px solid #ddd;
+      font-size:16px;
     }
-
     button{
       width:100%;
-      padding:12px;
-      margin-top:10px;
+      padding:14px;
       background:#0095f6;
       color:white;
       border:none;
-      border-radius:5px;
+      border-radius:8px;
       font-size:16px;
+      margin-top:8px;
     }
   </style>
 </head>
+
 <body>
 
-  <div class="profile">
-    <img id="profileImg" src="https://picsum.photos/200" />
-    <h2 id="username">instfatih</h2>
+<div class="box">
+  <h2>InstFatih</h2>
 
-    <textarea id="bio" placeholder="Biyografin..."></textarea>
-    <button onclick="saveBio()">Kaydet</button>
-  </div>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Şifre">
 
-<script>
-  // bio varsa yükle
-  document.getElementById("bio").value =
-    localStorage.getItem("bio") || "";
+  <button onclick="login()">Giriş Yap</button>
+  <button onclick="register()">Kayıt Ol</button>
+</div>
 
-  function saveBio(){
-    const bio = document.getElementById("bio").value;
-    localStorage.setItem("bio", bio);
-    alert("Bio kaydedildi ✅");
-  }
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+    authDomain: "instafatih-28213.firebaseapp.com",
+    projectId: "instafatih-28213",
+    storageBucket: "instafatih-28213.firebasestorage.app",
+    messagingSenderId: "885847505120",
+    appId: "1:885847505120:web:06e60cf83d229e84a37885"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  window.login = async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try{
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "home.html";
+    }catch(e){
+      alert(e.message);
+    }
+  };
+
+  window.register = async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try{
+      await createUserWithEmailAndPassword(auth, email, password);
+      window.location.href = "home.html";
+    }catch(e){
+      alert(e.message);
+    }
+  };
 </script>
 
 </body>
