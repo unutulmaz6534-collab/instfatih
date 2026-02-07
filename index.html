@@ -5,12 +5,12 @@
 <title>Grup Sohbet</title>
 
 <style>
-body {
+body{
   margin:0;
   background:#fafafa;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
 }
-#app {
+#app{
   max-width:420px;
   margin:auto;
   height:100vh;
@@ -20,56 +20,49 @@ body {
   border-left:1px solid #dbdbdb;
   border-right:1px solid #dbdbdb;
 }
-header {
-  padding:8px;
-  border-bottom:1px solid #dbdbdb;
+header{
+  padding:10px;
   text-align:center;
+  font-weight:600;
+  border-bottom:1px solid #dbdbdb;
 }
-header select {
-  padding:6px;
-  border-radius:10px;
-  border:1px solid #dbdbdb;
-}
-#messages {
+#messages{
   flex:1;
   padding:10px;
   overflow-y:auto;
   background:#fafafa;
 }
-.msg {
+.msg{
   max-width:75%;
   padding:8px 12px;
   margin-bottom:6px;
   border-radius:18px;
   font-size:14px;
-  clear:both;
 }
-.me {
+.me{
   background:#3797f0;
   color:#fff;
   margin-left:auto;
 }
-.other {
+.other{
   background:#e4e6eb;
-  color:#000;
 }
-.name {
+.name{
   font-size:11px;
-  opacity:.7;
-  margin-bottom:2px;
+  opacity:.6;
 }
-footer {
-  border-top:1px solid #dbdbdb;
-  padding:8px;
+footer{
   display:flex;
+  padding:8px;
+  border-top:1px solid #dbdbdb;
 }
-footer input {
+footer input{
   flex:1;
   border:1px solid #dbdbdb;
   border-radius:20px;
   padding:8px 12px;
 }
-footer button {
+footer button{
   border:none;
   background:none;
   color:#3797f0;
@@ -83,56 +76,60 @@ footer button {
 <body>
 
 <div id="app">
-  <header>
-    Aktif kullanıcı:
-    <select id="user" onchange="render()">
-      <option value="Ali">Ali</option>
-      <option value="Veli">Veli</option>
-      <option value="Ayşe">Ayşe</option>
-    </select>
-  </header>
-
+  <header>Grup Sohbet</header>
   <div id="messages"></div>
-
   <footer>
     <input id="text" placeholder="Mesaj yaz...">
     <button onclick="send()">Gönder</button>
   </footer>
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
-let messages = JSON.parse(localStorage.getItem("groupChat")) || [];
+// 🔴 BURAYI KENDİ FIREBASE BİLGİLERİNLE DOLDUR
+const firebaseConfig = {
+  apiKey: "API_KEY",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "PROJECT_ID",
+};
 
-function send() {
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const username = "Kullanıcı" + Math.floor(Math.random()*9000+1000);
+const messagesRef = db.ref("messages");
+
+messagesRef.on("child_added", snap => {
+  const m = snap.val();
+  addMessage(m.user, m.text);
+});
+
+function send(){
   const text = document.getElementById("text").value.trim();
-  if (!text) return;
-
-  const user = document.getElementById("user").value;
-  messages.push({ user, text });
-  localStorage.setItem("groupChat", JSON.stringify(messages));
-  document.getElementById("text").value = "";
-  render();
-}
-
-function render() {
-  const currentUser = document.getElementById("user").value;
-  const box = document.getElementById("messages");
-  box.innerHTML = "";
-
-  messages.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "msg " + (m.user === currentUser ? "me" : "other");
-    div.innerHTML = `
-      <div class="name">${m.user}</div>
-      <div>${m.text}</div>
-    `;
-    box.appendChild(div);
+  if(!text) return;
+  messagesRef.push({
+    user: username,
+    text: text,
+    time: Date.now()
   });
-
-  box.scrollTop = box.scrollHeight;
+  document.getElementById("text").value="";
 }
 
-render();
+function addMessage(user,text){
+  const div = document.createElement("div");
+  div.className = "msg " + (user===username ? "me":"other");
+  div.innerHTML = `
+    <div class="name">${user}</div>
+    <div>${text}</div>
+  `;
+  document.getElementById("messages").appendChild(div);
+  document.getElementById("messages").scrollTop =
+    document.getElementById("messages").scrollHeight;
+}
 </script>
 
 </body>
