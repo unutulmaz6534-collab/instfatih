@@ -1,73 +1,63 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Gerçek Zamanlı Grup Chat</title>
+  <meta charset="UTF-8">
+  <title>Realtime Chat</title>
   <style>
     body { font-family: Arial; background:#111; color:#fff; }
-    #chat { max-width:500px; margin:20px auto; }
-    #messages { border:1px solid #444; height:300px; overflow-y:auto; padding:10px; }
-    input, button { width:100%; margin-top:5px; padding:10px; }
-    .msg { margin-bottom:6px; }
+    #messages { height: 300px; overflow-y:auto; border:1px solid #444; padding:10px; }
+    input, button { padding:10px; margin-top:5px; width:100%; }
   </style>
 </head>
 <body>
 
-<div id="chat">
-  <input id="name" placeholder="Adın" />
-  <div id="messages"></div>
-  <input id="text" placeholder="Mesaj yaz..." />
-  <button id="send">Gönder</button>
-</div>
+<h2>🔥 Gerçek Zamanlı Chat</h2>
+
+<div id="messages"></div>
+
+<input id="username" placeholder="Kullanıcı adın">
+<input id="text" placeholder="Mesaj yaz">
+<button onclick="sendMessage()">Gönder</button>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // 🔴 BURAYI KENDİ FIREBASE BİLGİLERİNLE DEĞİŞTİR
   const firebaseConfig = {
-    apiKey: "API_KEY",
-    authDomain: "PROJECT_ID.firebaseapp.com",
-    projectId: "PROJECT_ID",
-    storageBucket: "PROJECT_ID.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
+    apiKey: "AIzaSyC4SczNrhYyr_sTPv7gHdNmdCW8fcQEahc",
+    authDomain: "instafatih-28213.firebaseapp.com",
+    projectId: "instafatih-28213",
+    storageBucket: "instafatih-28213.appspot.com",
+    messagingSenderId: "885847505120",
+    appId: "1:885847505120:web:06e60cf83d229e84a37885"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
   const messagesDiv = document.getElementById("messages");
-  const sendBtn = document.getElementById("send");
 
-  const chatRef = collection(db, "odalar", "genel", "mesajlar");
+  const q = query(collection(db, "messages"), orderBy("time"));
 
-  // 🔴 GERÇEK ZAMANLI DİNLEME
-  onSnapshot(
-    query(chatRef, orderBy("createdAt")),
-    (snapshot) => {
-      messagesDiv.innerHTML = "";
-      snapshot.forEach(doc => {
-        const m = doc.data();
-        const div = document.createElement("div");
-        div.className = "msg";
-        div.textContent = m.name + ": " + m.text;
-        messagesDiv.appendChild(div);
-      });
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-  );
+  onSnapshot(q, (snapshot) => {
+    messagesDiv.innerHTML = "";
+    snapshot.forEach(doc => {
+      const m = doc.data();
+      messagesDiv.innerHTML += `<p><b>${m.user}:</b> ${m.text}</p>`;
+    });
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  });
 
-  // 🔴 MESAJ GÖNDERME
-  sendBtn.onclick = async () => {
-    const name = document.getElementById("name").value;
+  window.sendMessage = async () => {
+    const user = document.getElementById("username").value;
     const text = document.getElementById("text").value;
-    if (!name || !text) return;
+    if (!user || !text) return;
 
-    await addDoc(chatRef, {
-      name,
+    await addDoc(collection(db, "messages"), {
+      user,
       text,
-      createdAt: serverTimestamp()
+      time: serverTimestamp()
     });
 
     document.getElementById("text").value = "";
