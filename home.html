@@ -1,33 +1,109 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<title>InstFatih</title>
+  <meta charset="UTF-8" />
+  <title>InstFatih - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
-body { font-family: Arial; margin:0; background:#f2f2f2 }
-header {
-  background:#000; color:#fff;
-  padding:12px;
-  display:flex; justify-content:space-between;
-}
-.container { padding:15px }
-input, button {
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-}
-.post {
-  background:#fff;
-  padding:10px;
-  margin-top:10px;
-  border-radius:6px;
-}
-.post img {
-  width:100%;
-  border-radius:6px;
-}
-</style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
+      authDomain: "instafatih-28213.firebaseapp.com",
+      projectId: "instafatih-28213",
+      storageBucket: "instafatih-28213.firebasestorage.app",
+      messagingSenderId: "885847505120",
+      appId: "1:885847505120:web:06e60cf83d229e84a37885"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.logout = async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    };
+
+    window.paylas = async () => {
+      const text = document.getElementById("postText").value;
+      if (text.trim() === "") {
+        alert("Bir şey yaz");
+        return;
+      }
+
+      await addDoc(collection(db, "posts"), {
+        text: text,
+        time: Date.now()
+      });
+
+      document.getElementById("postText").value = "";
+      listele();
+    };
+
+    async function listele() {
+      const alan = document.getElementById("posts");
+      alan.innerHTML = "";
+
+      const q = query(collection(db, "posts"), orderBy("time", "desc"));
+      const snap = await getDocs(q);
+
+      snap.forEach(doc => {
+        const div = document.createElement("div");
+        div.className = "post";
+        div.innerText = doc.data().text;
+        alan.appendChild(div);
+      });
+    }
+
+    window.onload = listele;
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    header {
+      background: #000;
+      color: #fff;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .box {
+      background: #fff;
+      margin: 15px;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .post {
+      background: #fff;
+      margin: 15px;
+      padding: 15px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 
 <body>
@@ -37,86 +113,12 @@ input, button {
   <button onclick="logout()">Çıkış</button>
 </header>
 
-<div class="container">
-
-  <input type="file" id="image">
-  <input type="text" id="caption" placeholder="Açıklama yaz">
-  <button onclick="uploadPost()">Paylaş</button>
-
-  <hr>
-  <div id="posts"></div>
-
+<div class="box">
+  <textarea id="postText" placeholder="Ne düşünüyorsun?"></textarea>
+  <button onclick="paylas()">Paylaş</button>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
-  authDomain: "instafatih-28213.firebaseapp.com",
-  projectId: "instafatih-28213",
-  storageBucket: "instafatih-28213.firebasestorage.app",
-  appId: "1:885847505120:web:06e60cf83d229e84a37885"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    window.location.href = "index.html";
-  } else {
-    loadPosts();
-  }
-});
-
-window.uploadPost = async () => {
-  const file = document.getElementById("image").files[0];
-  const caption = document.getElementById("caption").value;
-  const user = auth.currentUser;
-
-  if (!file) return alert("Foto seç");
-
-  const imgRef = ref(storage, `posts/${Date.now()}_${file.name}`);
-  await uploadBytes(imgRef, file);
-  const imgURL = await getDownloadURL(imgRef);
-
-  await addDoc(collection(db, "posts"), {
-    uid: user.uid,
-    caption,
-    imgURL,
-    created: Date.now()
-  });
-
-  document.getElementById("caption").value = "";
-  loadPosts();
-};
-
-async function loadPosts() {
-  document.getElementById("posts").innerHTML = "";
-  const q = query(collection(db,"posts"), orderBy("created","desc"));
-  const snap = await getDocs(q);
-
-  snap.forEach(doc => {
-    const p = doc.data();
-    document.getElementById("posts").innerHTML += `
-      <div class="post">
-        <img src="${p.imgURL}">
-        <p>${p.caption}</p>
-      </div>
-    `;
-  });
-}
-
-window.logout = () => {
-  signOut(auth);
-};
-</script>
+<div id="posts"></div>
 
 </body>
 </html>
