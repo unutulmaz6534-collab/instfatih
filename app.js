@@ -7,15 +7,15 @@ function paylas() {
     return;
   }
 
-  const postDiv = document.createElement("div");
-  postDiv.className = "post";
+  const post = document.createElement("div");
+  post.className = "post";
 
-  postDiv.innerHTML = `
+  post.innerHTML = `
     <img src="${imgUrl}">
     <p>${desc}</p>
   `;
 
-  document.getElementById("posts").prepend(postDiv);
+  document.getElementById("posts").prepend(post);
 
   document.getElementById("imgUrl").value = "";
   document.getElementById("desc").value = "";
