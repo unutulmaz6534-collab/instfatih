@@ -1,11 +1,15 @@
 body {
   margin: 0;
+  font-family: Arial, sans-serif;
   background: #000;
   color: #fff;
-  font-family: Arial, sans-serif;
 }
 
-/* ÜST BAR */
+body.light {
+  background: #fff;
+  color: #000;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -19,23 +23,19 @@ body {
   font-weight: bold;
 }
 
-.top-icons i {
+.top-icons i, #themeBtn {
   font-size: 22px;
   margin-left: 12px;
-}
-
-#themeBtn {
+  cursor: pointer;
   background: none;
   border: none;
-  color: white;
-  font-size: 20px;
+  color: inherit;
 }
 
-/* HİKAYELER */
 .stories {
   display: flex;
-  gap: 10px;
-  padding: 10px;
+  gap: 12px;
+  padding: 12px;
   overflow-x: auto;
 }
 
@@ -43,16 +43,16 @@ body {
   min-width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743);
+  background: linear-gradient(45deg, #ff0066, #ff9900);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
-/* YENİ POST */
 .new-post {
-  padding: 10px;
+  padding: 12px;
 }
 
 .new-post input,
@@ -63,19 +63,46 @@ body {
 }
 
 .new-post button {
-  padding: 8px 12px;
+  padding: 8px 16px;
 }
 
-/* POST */
+#feed {
+  padding: 12px;
+}
+
 .post {
-  margin: 10px;
-  border: 1px solid #222;
+  margin-bottom: 20px;
 }
 
 .post img {
   width: 100%;
+  border-radius: 6px;
 }
 
-.post p {
-  padding: 8px;
+.post .actions {
+  margin: 6px 0;
+}
+
+.like {
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.like.active {
+  color: red;
+}
+
+#storyModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #000;
+  justify-content: center;
+  align-items: center;
+}
+
+#storyModal img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
