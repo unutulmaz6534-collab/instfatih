@@ -1,54 +1,88 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Giriş Yap</title>
+  <meta charset="UTF-8">
+  <title>InstFatih - Giriş</title>
   <style>
     body {
-      font-family: Arial;
+      margin: 0;
+      font-family: Arial, sans-serif;
       background: #f2f2f2;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
-    .box {
+
+    .card {
       background: white;
-      padding: 20px;
+      padding: 25px;
       border-radius: 8px;
       width: 300px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       text-align: center;
     }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
     input {
       width: 100%;
-      padding: 8px;
-      margin: 6px 0;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
     }
+
     button {
       width: 100%;
       padding: 10px;
-      margin-top: 6px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
+    }
+
+    .register {
+      background: #ff9800;
+      color: white;
+    }
+
+    .login {
+      background: #4caf50;
+      color: white;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
 
-<div class="box">
-  <h3>Giriş / Kayıt</h3>
-  <input id="email" type="email" placeholder="E-posta">
-  <input id="password" type="password" placeholder="Şifre">
+  <div class="card">
+    <h2>Giriş / Kayıt</h2>
 
-  <button onclick="register()">Kayıt Ol</button>
-  <button onclick="login()">Giriş Yap</button>
+    <input type="email" id="email" placeholder="E-posta">
+    <input type="password" id="password" placeholder="Şifre">
 
-  <p id="msg"></p>
-</div>
+    <button class="register" onclick="register()">Kayıt Ol</button>
+    <button class="login" onclick="login()">Giriş Yap</button>
+
+    <div class="error" id="error"></div>
+  </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-  from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
@@ -62,29 +96,36 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  // Zaten girişliyse direkt home'a at
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      window.location.href = "home.html";
+    }
+  });
+
   window.register = function () {
     const email = document.getElementById("email").value;
-    const pass = document.getElementById("password").value;
+    const password = document.getElementById("password").value;
 
-    createUserWithEmailAndPassword(auth, email, pass)
+    createUserWithEmailAndPassword(auth, email, password)
       .then(() => {
-        document.getElementById("msg").innerText = "✅ Kayıt başarılı";
+        window.location.href = "home.html";
       })
       .catch(err => {
-        document.getElementById("msg").innerText = err.message;
+        document.getElementById("error").innerText = err.message;
       });
   };
 
   window.login = function () {
     const email = document.getElementById("email").value;
-    const pass = document.getElementById("password").value;
+    const password = document.getElementById("password").value;
 
-    signInWithEmailAndPassword(auth, email, pass)
+    signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        document.getElementById("msg").innerText = "🎉 Giriş başarılı";
+        window.location.href = "home.html";
       })
       .catch(err => {
-        document.getElementById("msg").innerText = err.message;
+        document.getElementById("error").innerText = err.message;
       });
   };
 </script>
