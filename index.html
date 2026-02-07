@@ -3,86 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <title>InstFatih - Giriş</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: #f2f2f2;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
-
-    .card {
+    .box {
       background: white;
-      padding: 25px;
-      border-radius: 8px;
+      padding: 20px;
       width: 300px;
+      border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
       text-align: center;
     }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    input {
+    input, button {
       width: 100%;
       padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .register {
-      background: #ff9800;
-      color: white;
-    }
-
-    .login {
-      background: #4caf50;
-      color: white;
-    }
-
-    .error {
-      color: red;
       margin-top: 10px;
-      font-size: 14px;
+      font-size: 16px;
+    }
+    button {
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
+  <div class="box">
     <h2>Giriş / Kayıt</h2>
-
     <input type="email" id="email" placeholder="E-posta">
     <input type="password" id="password" placeholder="Şifre">
-
-    <button class="register" onclick="register()">Kayıt Ol</button>
-    <button class="login" onclick="login()">Giriş Yap</button>
-
-    <div class="error" id="error"></div>
+    <button onclick="register()">Kayıt Ol</button>
+    <button onclick="login()">Giriş Yap</button>
+    <p id="message" style="color:red; text-align:center;"></p>
   </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+  from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC4SCzN-hYyr_sTPv7gHdNmdCW8fcQEahc",
@@ -96,13 +64,6 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Zaten girişliyse direkt home'a at
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      window.location.href = "home.html";
-    }
-  });
-
   window.register = function () {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
@@ -111,8 +72,8 @@
       .then(() => {
         window.location.href = "home.html";
       })
-      .catch(err => {
-        document.getElementById("error").innerText = err.message;
+      .catch(error => {
+        document.getElementById("message").innerText = error.message;
       });
   };
 
@@ -124,8 +85,8 @@
       .then(() => {
         window.location.href = "home.html";
       })
-      .catch(err => {
-        document.getElementById("error").innerText = err.message;
+      .catch(error => {
+        document.getElementById("message").innerText = error.message;
       });
   };
 </script>
