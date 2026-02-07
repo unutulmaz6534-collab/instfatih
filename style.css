@@ -22,51 +22,60 @@ body {
 .top-icons i {
   font-size: 22px;
   margin-left: 12px;
-  cursor: pointer;
 }
 
 #themeBtn {
   background: none;
   border: none;
+  color: white;
   font-size: 20px;
-  cursor: pointer;
 }
 
 /* HİKAYELER */
 .stories {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   padding: 10px;
   overflow-x: auto;
-  border-bottom: 1px solid #222;
 }
 
 .story {
-  min-width: 60px;
-  height: 60px;
+  min-width: 70px;
+  height: 70px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #feda75, #d62976, #962fbf);
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
 }
-/* POSTLAR */
-#posts {
+
+/* YENİ POST */
+.new-post {
   padding: 10px;
 }
 
+.new-post input,
+.new-post textarea {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px;
+}
+
+.new-post button {
+  padding: 8px 12px;
+}
+
+/* POST */
 .post {
-  margin-bottom: 20px;
-  border-bottom: 1px solid #222;
+  margin: 10px;
+  border: 1px solid #222;
 }
 
 .post img {
   width: 100%;
-  border-radius: 6px;
 }
 
 .post p {
-  padding: 6px 0;
-  font-size: 14px;
+  padding: 8px;
 }
