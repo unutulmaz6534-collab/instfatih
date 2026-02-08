@@ -2,104 +2,147 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Grup Sohbet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>instafatih</title>
+
 <style>
 body{
   margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f0f2f5;
+  font-family: Arial, Helvetica, sans-serif;
+  background:#fafafa;
+  color:#111;
 }
-#chat{
-  max-width:500px;
+
+header{
+  background:#fff;
+  border-bottom:1px solid #ddd;
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.container{
+  max-width:420px;
   margin:auto;
-  height:100vh;
+}
+
+/* STORIES */
+.stories{
   display:flex;
-  flex-direction:column;
-  background:white;
-}
-#messages{
-  flex:1;
+  overflow-x:auto;
+  background:#fff;
   padding:10px;
-  overflow-y:auto;
+  border-bottom:1px solid #ddd;
 }
-.msg{
-  padding:8px 12px;
-  margin:6px 0;
-  border-radius:12px;
-  background:#e4e6eb;
+
+.story{
+  width:60px;
+  margin-right:10px;
+  text-align:center;
+  font-size:12px;
+}
+
+.story .circle{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background:#ddd;
+  margin-bottom:5px;
+}
+
+/* POST */
+.post{
+  background:#fff;
+  border:1px solid #ddd;
+  margin-bottom:15px;
+}
+
+.post-header{
+  padding:10px;
+  font-weight:bold;
+}
+
+.post img{
+  width:100%;
+  display:block;
+}
+
+.post-actions{
+  padding:8px 10px;
+  font-size:18px;
+}
+
+.post-caption{
+  padding:0 10px 10px;
   font-size:14px;
 }
-.name{
-  font-size:11px;
-  opacity:.6;
+
+/* PROFILE */
+.profile{
+  background:#fff;
+  padding:15px;
+  border-top:1px solid #ddd;
 }
-#send{
+
+.profile h3{
+  margin:0;
+}
+
+/* BOTTOM NAV */
+nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#fff;
+  border-top:1px solid #ddd;
   display:flex;
-  border-top:1px solid #ccc;
-}
-#send input{
-  flex:1;
-  padding:10px;
-  border:none;
-}
-#send button{
-  border:none;
-  background:#3797f0;
-  color:white;
-  padding:0 20px;
-  cursor:pointer;
+  justify-content:space-around;
+  padding:10px 0;
+  font-size:20px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="chat">
-  <div id="messages"></div>
-  <div id="send">
-    <input id="text" placeholder="Mesaj yaz...">
-    <button onclick="send()">Gönder</button>
+<header>instafatih</header>
+
+<div class="container">
+
+  <!-- STORIES -->
+  <div class="stories">
+    <div class="story"><div class="circle"></div>fatih</div>
+    <div class="story"><div class="circle"></div>ali</div>
+    <div class="story"><div class="circle"></div>veli</div>
+    <div class="story"><div class="circle"></div>ayşe</div>
   </div>
+
+  <!-- POST -->
+  <div class="post">
+    <div class="post-header">@fatih</div>
+    <img src="https://picsum.photos/400/400">
+    <div class="post-actions">♡ 💬</div>
+    <div class="post-caption"><b>@fatih</b> İlk gönderi</div>
+  </div>
+
+  <div class="post">
+    <div class="post-header">@ali</div>
+    <img src="https://picsum.photos/401/401">
+    <div class="post-actions">♡ 💬</div>
+    <div class="post-caption"><b>@ali</b> Deneme</div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="profile">
+    <h3>@fatih</h3>
+    <p>Gönderi: 2 | Takipçi: 10 | Takip: 5</p>
+  </div>
+
 </div>
 
-<!-- Firebase v8 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<script>
-var firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "PROJECT_ID"
-};
-firebase.initializeApp(firebaseConfig);
-
-var db = firebase.database();
-var ref = db.ref("group");
-
-var username = "User" + Math.floor(Math.random()*9000+1000);
-
-ref.limitToLast(200).on("child_added", function(snap){
-  var m = snap.val();
-  var div = document.createElement("div");
-  div.className = "msg";
-  div.innerHTML = `<div class="name">${m.user}</div>${m.text}`;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-});
-
-function send(){
-  var t = text.value.trim();
-  if(!t) return;
-  ref.push({
-    user: username,
-    text: t,
-    time: Date.now()
-  });
-  text.value="";
-}
-</script>
+<nav>
+  🏠 🔍 ➕ 👤
+</nav>
 
 </body>
 </html>
