@@ -2,31 +2,41 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Sohbet</title>
+<title>Chat</title>
+
 <style>
 body{
   margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f0f2f5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
+  background:#fafafa;
 }
-#chat{
-  max-width:500px;
+#app{
+  max-width:420px;
   margin:auto;
   height:100vh;
   display:flex;
   flex-direction:column;
   background:white;
+  border-left:1px solid #dbdbdb;
+  border-right:1px solid #dbdbdb;
+}
+header{
+  padding:12px;
+  text-align:center;
+  font-weight:600;
+  border-bottom:1px solid #dbdbdb;
 }
 #messages{
   flex:1;
   padding:10px;
   overflow-y:auto;
+  background:#fafafa;
 }
 .msg{
-  padding:8px 12px;
-  margin:5px 0;
-  border-radius:16px;
   max-width:75%;
+  padding:8px 12px;
+  border-radius:18px;
+  margin-bottom:8px;
   font-size:14px;
 }
 .me{
@@ -37,40 +47,57 @@ body{
 .other{
   background:#e4e6eb;
 }
-#sendBox{
+.meta{
+  font-size:11px;
+  opacity:.6;
+  margin-top:4px;
+}
+.actions{
+  font-size:12px;
+  margin-top:4px;
+}
+.actions span{
+  cursor:pointer;
+  margin-right:8px;
+}
+footer{
   display:flex;
-  border-top:1px solid #ccc;
+  padding:8px;
+  border-top:1px solid #dbdbdb;
 }
-#sendBox input{
+footer input{
   flex:1;
-  padding:10px;
-  border:none;
-  font-size:14px;
+  border:1px solid #dbdbdb;
+  border-radius:20px;
+  padding:8px 12px;
 }
-#sendBox button{
+footer button{
+  background:none;
   border:none;
-  background:#3797f0;
-  color:white;
-  padding:0 20px;
+  color:#3797f0;
+  font-weight:600;
+  margin-left:8px;
   cursor:pointer;
 }
 </style>
 </head>
 
 <body>
-<div id="chat">
+<div id="app">
+  <header>Grup Sohbet</header>
   <div id="messages"></div>
-  <div id="sendBox">
+  <footer>
     <input id="text" placeholder="Mesaj yaz...">
     <button onclick="send()">Gönder</button>
-  </div>
+  </footer>
 </div>
 
-<!-- FIREBASE -->
+<!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
+// 🔴 KENDİ FIREBASE BİLGİLERİNİ YAZ
 var firebaseConfig = {
   apiKey: "API_KEY",
   authDomain: "PROJECT_ID.firebaseapp.com",
@@ -80,33 +107,62 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 var db = firebase.database();
-var messagesRef = db.ref("chat");
+var ref = db.ref("messages");
 
-var username = "User" + Math.floor(Math.random()*10000);
+var username = "User" + Math.floor(Math.random()*9000+1000);
 
-messagesRef.limitToLast(100).on("child_added", function(snapshot){
-  var m = snapshot.val();
-  addMessage(m.user, m.text);
+// MESAJLARI DİNLE
+ref.limitToLast(100).on("child_added", snap=>{
+  draw(snap.key, snap.val());
 });
 
+// MESAJ GÖNDER
 function send(){
-  var input = document.getElementById("text");
-  if(input.value.trim() === "") return;
-
-  messagesRef.push({
+  var t = text.value.trim();
+  if(!t) return;
+  ref.push({
     user: username,
-    text: input.value
+    text: t,
+    likes: 0,
+    seen: false,
+    time: Date.now()
   });
-  input.value = "";
+  text.value="";
 }
 
-function addMessage(user,text){
-  var div = document.createElement("div");
-  div.className = "msg " + (user === username ? "me" : "other");
-  div.innerText = text;
-  document.getElementById("messages").appendChild(div);
-  document.getElementById("messages").scrollTop =
-    document.getElementById("messages").scrollHeight;
+// EKRANA ÇİZ
+function draw(id,m){
+  var d = document.createElement("div");
+  d.className = "msg " + (m.user===username?"me":"other");
+  d.id = id;
+  d.innerHTML = `
+    <div>${m.text}</div>
+    <div class="actions">
+      <span onclick="like('${id}')">❤️ ${m.likes}</span>
+      ${m.user===username?`<span onclick="del('${id}')">Sil</span>`:""}
+    </div>
+    <div class="meta">${m.seen?"Görüldü":""}</div>
+  `;
+  messages.appendChild(d);
+  messages.scrollTop = messages.scrollHeight;
+
+  // okundu
+  if(m.user!==username && !m.seen){
+    ref.child(id).update({seen:true});
+  }
+}
+
+// BEĞENİ
+function like(id){
+  ref.child(id).once("value",s=>{
+    ref.child(id).update({likes:(s.val().likes||0)+1});
+  });
+}
+
+// SİL
+function del(id){
+  ref.child(id).remove();
+  document.getElementById(id)?.remove();
 }
 </script>
 </body>
