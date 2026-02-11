@@ -2,122 +2,140 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Instafatih - Stories</title>
+<title>Instafatih Chat</title>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
 
 <style>
 body{
-  background:#fafafa;
-  font-family:Arial;
   margin:0;
+  background:#e5ddd5;
+  font-family:Arial;
 }
 
 .header{
-  background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+  background:#075E54;
   color:white;
   padding:15px;
-  font-size:20px;
+  font-size:18px;
   font-weight:bold;
   text-align:center;
 }
 
-.story-upload{
+.chat{
+  height:80vh;
+  overflow-y:auto;
   padding:15px;
-  text-align:center;
+}
+
+.message{
+  max-width:70%;
+  padding:10px;
+  margin:5px 0;
+  border-radius:10px;
+  word-wrap:break-word;
+}
+
+.me{
+  background:#dcf8c6;
+  margin-left:auto;
+}
+
+.other{
+  background:white;
+  margin-right:auto;
+}
+
+.input-area{
+  display:flex;
+  padding:10px;
+  background:#f0f0f0;
+}
+
+input{
+  flex:1;
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  outline:none;
 }
 
 button{
+  margin-left:10px;
   padding:10px 20px;
   border:none;
   border-radius:20px;
-  background:#0095f6;
+  background:#075E54;
   color:white;
-  font-weight:bold;
   cursor:pointer;
-}
-
-.stories{
-  display:flex;
-  gap:15px;
-  overflow-x:auto;
-  padding:15px;
-}
-
-.story{
-  width:90px;
-  text-align:center;
-}
-
-.story img{
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  border:3px solid #e1306c;
-  object-fit:cover;
 }
 </style>
 </head>
-
 <body>
 
-<div class="header">Instafatih Hikayeler</div>
+<div class="header">Instafatih Grup</div>
 
-<div class="story-upload">
-  <input type="file" id="fileInput">
-  <br><br>
-  <button onclick="uploadStory()">Hikaye Yükle</button>
+<div class="chat" id="chat"></div>
+
+<div class="input-area">
+  <input type="text" id="messageInput" placeholder="Mesaj yaz...">
+  <button onclick="sendMessage()">Gönder</button>
 </div>
-
-<div class="stories" id="stories"></div>
 
 <script>
 const firebaseConfig = {
-  apiKey: "BURAYA SENİN API KEY",
+  apiKey: "BURAYA",
   authDomain: "BURAYA",
   projectId: "BURAYA",
-  storageBucket: "BURAYA",
-  messagingSenderId: "BURAYA",
-  appId: "BURAYA"
 };
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
-const storage = firebase.storage();
+const auth = firebase.auth();
 
-auth.signInAnonymously();
+let currentUser;
 
-function uploadStory(){
-  const file = document.getElementById("fileInput").files[0];
-  if(!file) return alert("Foto seç");
+auth.signInAnonymously().then(user=>{
+  currentUser = user.user.uid;
+});
 
-  const ref = storage.ref("stories/" + Date.now());
-  ref.put(file).then(snapshot=>{
-    snapshot.ref.getDownloadURL().then(url=>{
-      db.collection("stories").add({
-        image:url,
-        time:Date.now()
-      });
-      alert("Hikaye yüklendi!");
-    });
+function sendMessage(){
+  const text = document.getElementById("messageInput").value;
+  if(text.trim() === "") return;
+
+  db.collection("messages").add({
+    text:text,
+    sender:currentUser,
+    time:Date.now()
   });
+
+  document.getElementById("messageInput").value="";
 }
 
-db.collection("stories")
-.orderBy("time","desc")
+db.collection("messages")
+.orderBy("time")
 .onSnapshot(snapshot=>{
-  document.getElementById("stories").innerHTML="";
+  const chat = document.getElementById("chat");
+  chat.innerHTML="";
+
   snapshot.forEach(doc=>{
     const data = doc.data();
-    document.getElementById("stories").innerHTML += `
-      <div class="story">
-        <img src="${data.image}">
-      </div>
-    `;
+    const div = document.createElement("div");
+    div.classList.add("message");
+
+    if(data.sender === currentUser){
+      div.classList.add("me");
+    }else{
+      div.classList.add("other");
+    }
+
+    div.innerText = data.text;
+    chat.appendChild(div);
   });
+
+  chat.scrollTop = chat.scrollHeight;
 });
 </script>
 
