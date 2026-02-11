@@ -3,146 +3,180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>instafatih</title>
+<title>Instafatih - Hikayeler</title>
 
 <style>
 body{
   margin:0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:Arial, Helvetica, sans-serif;
   background:#fafafa;
-  color:#111;
 }
 
-header{
-  background:#fff;
-  border-bottom:1px solid #ddd;
-  padding:12px;
-  text-align:center;
-  font-weight:bold;
-}
-
-.container{
-  max-width:420px;
-  margin:auto;
-}
-
-/* STORIES */
-.stories{
+.story-bar{
   display:flex;
   overflow-x:auto;
-  background:#fff;
   padding:10px;
   border-bottom:1px solid #ddd;
+  background:white;
 }
 
 .story{
-  width:60px;
-  margin-right:10px;
-  text-align:center;
-  font-size:12px;
-}
-
-.story .circle{
-  width:60px;
-  height:60px;
+  width:70px;
+  height:70px;
   border-radius:50%;
-  background:#ddd;
-  margin-bottom:5px;
+  padding:3px;
+  margin-right:10px;
+  background:linear-gradient(45deg,#feda75,#d62976,#962fbf);
+  cursor:pointer;
 }
 
-/* POST */
-.post{
-  background:#fff;
-  border:1px solid #ddd;
-  margin-bottom:15px;
-}
-
-.post-header{
-  padding:10px;
-  font-weight:bold;
-}
-
-.post img{
+.story img{
   width:100%;
-  display:block;
+  height:100%;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid white;
 }
 
-.post-actions{
-  padding:8px 10px;
-  font-size:18px;
-}
-
-.post-caption{
-  padding:0 10px 10px;
-  font-size:14px;
-}
-
-/* PROFILE */
-.profile{
-  background:#fff;
-  padding:15px;
-  border-top:1px solid #ddd;
-}
-
-.profile h3{
-  margin:0;
-}
-
-/* BOTTOM NAV */
-nav{
+.viewer{
   position:fixed;
-  bottom:0;
+  top:0;
+  left:0;
   width:100%;
-  background:#fff;
-  border-top:1px solid #ddd;
+  height:100%;
+  background:black;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+
+.viewer img{
+  max-width:100%;
+  max-height:90%;
+}
+
+.progress-container{
+  position:absolute;
+  top:20px;
+  width:90%;
   display:flex;
-  justify-content:space-around;
-  padding:10px 0;
-  font-size:20px;
+}
+
+.progress{
+  flex:1;
+  height:3px;
+  background:rgba(255,255,255,0.3);
+  margin:2px;
+}
+
+.progress span{
+  display:block;
+  height:100%;
+  width:0%;
+  background:white;
+}
+
+.close{
+  position:absolute;
+  top:20px;
+  right:20px;
+  color:white;
+  font-size:25px;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header>instafatih</header>
-
-<div class="container">
-
-  <!-- STORIES -->
-  <div class="stories">
-    <div class="story"><div class="circle"></div>fatih</div>
-    <div class="story"><div class="circle"></div>ali</div>
-    <div class="story"><div class="circle"></div>veli</div>
-    <div class="story"><div class="circle"></div>ayşe</div>
-  </div>
-
-  <!-- POST -->
-  <div class="post">
-    <div class="post-header">@fatih</div>
-    <img src="https://picsum.photos/400/400">
-    <div class="post-actions">♡ 💬</div>
-    <div class="post-caption"><b>@fatih</b> İlk gönderi</div>
-  </div>
-
-  <div class="post">
-    <div class="post-header">@ali</div>
-    <img src="https://picsum.photos/401/401">
-    <div class="post-actions">♡ 💬</div>
-    <div class="post-caption"><b>@ali</b> Deneme</div>
-  </div>
-
-  <!-- PROFILE -->
-  <div class="profile">
-    <h3>@fatih</h3>
-    <p>Gönderi: 2 | Takipçi: 10 | Takip: 5</p>
-  </div>
-
+<div class="story-bar" id="storyBar">
 </div>
 
-<nav>
-  🏠 🔍 ➕ 👤
-</nav>
+<div class="viewer" id="viewer">
+  <div class="progress-container" id="progressContainer"></div>
+  <span class="close" onclick="closeViewer()">✕</span>
+  <img id="storyImage">
+</div>
+
+<script>
+
+let stories = [];
+let currentIndex = 0;
+let timer;
+
+function addStory(src){
+  stories.push(src);
+  renderStories();
+}
+
+function renderStories(){
+  const bar = document.getElementById("storyBar");
+  bar.innerHTML="";
+  stories.forEach((src,index)=>{
+    bar.innerHTML+=`
+      <div class="story" onclick="openViewer(${index})">
+        <img src="${src}">
+      </div>
+    `;
+  });
+}
+
+function openViewer(index){
+  currentIndex=index;
+  document.getElementById("viewer").style.display="flex";
+  startStory();
+}
+
+function startStory(){
+  const img = document.getElementById("storyImage");
+  img.src=stories[currentIndex];
+
+  createProgress();
+
+  let progress = document.querySelectorAll(".progress span")[currentIndex];
+  let width=0;
+
+  timer=setInterval(()=>{
+    width+=2;
+    progress.style.width=width+"%";
+    if(width>=100){
+      clearInterval(timer);
+      nextStory();
+    }
+  },100);
+}
+
+function createProgress(){
+  const container=document.getElementById("progressContainer");
+  container.innerHTML="";
+  stories.forEach(()=>{
+    container.innerHTML+=`
+      <div class="progress"><span></span></div>
+    `;
+  });
+}
+
+function nextStory(){
+  currentIndex++;
+  if(currentIndex>=stories.length){
+    closeViewer();
+  }else{
+    startStory();
+  }
+}
+
+function closeViewer(){
+  document.getElementById("viewer").style.display="none";
+  clearInterval(timer);
+}
+
+/* ÖRNEK HİKAYELER */
+addStory("https://picsum.photos/400/700?1");
+addStory("https://picsum.photos/400/700?2");
+addStory("https://picsum.photos/400/700?3");
+
+</script>
 
 </body>
 </html>
