@@ -1,181 +1,124 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Instafatih - Hikayeler</title>
+<title>Instafatih - Stories</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
 
 <style>
 body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
   background:#fafafa;
+  font-family:Arial;
+  margin:0;
 }
 
-.story-bar{
+.header{
+  background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+  color:white;
+  padding:15px;
+  font-size:20px;
+  font-weight:bold;
+  text-align:center;
+}
+
+.story-upload{
+  padding:15px;
+  text-align:center;
+}
+
+button{
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  background:#0095f6;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.stories{
   display:flex;
+  gap:15px;
   overflow-x:auto;
-  padding:10px;
-  border-bottom:1px solid #ddd;
-  background:white;
+  padding:15px;
 }
 
 .story{
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  padding:3px;
-  margin-right:10px;
-  background:linear-gradient(45deg,#feda75,#d62976,#962fbf);
-  cursor:pointer;
+  width:90px;
+  text-align:center;
 }
 
 .story img{
-  width:100%;
-  height:100%;
+  width:80px;
+  height:80px;
   border-radius:50%;
+  border:3px solid #e1306c;
   object-fit:cover;
-  border:3px solid white;
-}
-
-.viewer{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:black;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-}
-
-.viewer img{
-  max-width:100%;
-  max-height:90%;
-}
-
-.progress-container{
-  position:absolute;
-  top:20px;
-  width:90%;
-  display:flex;
-}
-
-.progress{
-  flex:1;
-  height:3px;
-  background:rgba(255,255,255,0.3);
-  margin:2px;
-}
-
-.progress span{
-  display:block;
-  height:100%;
-  width:0%;
-  background:white;
-}
-
-.close{
-  position:absolute;
-  top:20px;
-  right:20px;
-  color:white;
-  font-size:25px;
-  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="story-bar" id="storyBar">
+<div class="header">Instafatih Hikayeler</div>
+
+<div class="story-upload">
+  <input type="file" id="fileInput">
+  <br><br>
+  <button onclick="uploadStory()">Hikaye Yükle</button>
 </div>
 
-<div class="viewer" id="viewer">
-  <div class="progress-container" id="progressContainer"></div>
-  <span class="close" onclick="closeViewer()">✕</span>
-  <img id="storyImage">
-</div>
+<div class="stories" id="stories"></div>
 
 <script>
+const firebaseConfig = {
+  apiKey: "BURAYA SENİN API KEY",
+  authDomain: "BURAYA",
+  projectId: "BURAYA",
+  storageBucket: "BURAYA",
+  messagingSenderId: "BURAYA",
+  appId: "BURAYA"
+};
 
-let stories = [];
-let currentIndex = 0;
-let timer;
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-function addStory(src){
-  stories.push(src);
-  renderStories();
+auth.signInAnonymously();
+
+function uploadStory(){
+  const file = document.getElementById("fileInput").files[0];
+  if(!file) return alert("Foto seç");
+
+  const ref = storage.ref("stories/" + Date.now());
+  ref.put(file).then(snapshot=>{
+    snapshot.ref.getDownloadURL().then(url=>{
+      db.collection("stories").add({
+        image:url,
+        time:Date.now()
+      });
+      alert("Hikaye yüklendi!");
+    });
+  });
 }
 
-function renderStories(){
-  const bar = document.getElementById("storyBar");
-  bar.innerHTML="";
-  stories.forEach((src,index)=>{
-    bar.innerHTML+=`
-      <div class="story" onclick="openViewer(${index})">
-        <img src="${src}">
+db.collection("stories")
+.orderBy("time","desc")
+.onSnapshot(snapshot=>{
+  document.getElementById("stories").innerHTML="";
+  snapshot.forEach(doc=>{
+    const data = doc.data();
+    document.getElementById("stories").innerHTML += `
+      <div class="story">
+        <img src="${data.image}">
       </div>
     `;
   });
-}
-
-function openViewer(index){
-  currentIndex=index;
-  document.getElementById("viewer").style.display="flex";
-  startStory();
-}
-
-function startStory(){
-  const img = document.getElementById("storyImage");
-  img.src=stories[currentIndex];
-
-  createProgress();
-
-  let progress = document.querySelectorAll(".progress span")[currentIndex];
-  let width=0;
-
-  timer=setInterval(()=>{
-    width+=2;
-    progress.style.width=width+"%";
-    if(width>=100){
-      clearInterval(timer);
-      nextStory();
-    }
-  },100);
-}
-
-function createProgress(){
-  const container=document.getElementById("progressContainer");
-  container.innerHTML="";
-  stories.forEach(()=>{
-    container.innerHTML+=`
-      <div class="progress"><span></span></div>
-    `;
-  });
-}
-
-function nextStory(){
-  currentIndex++;
-  if(currentIndex>=stories.length){
-    closeViewer();
-  }else{
-    startStory();
-  }
-}
-
-function closeViewer(){
-  document.getElementById("viewer").style.display="none";
-  clearInterval(timer);
-}
-
-/* ÖRNEK HİKAYELER */
-addStory("https://picsum.photos/400/700?1");
-addStory("https://picsum.photos/400/700?2");
-addStory("https://picsum.photos/400/700?3");
-
+});
 </script>
 
 </body>
