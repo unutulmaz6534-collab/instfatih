@@ -2,86 +2,120 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Instafatih Chat</title>
+<title>Instafatih</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
 
 <style>
 body{
   margin:0;
-  background:#e5ddd5;
   font-family:Arial;
+  background:#fafafa;
 }
 
-.header{
-  background:#075E54;
-  color:white;
-  padding:15px;
-  font-size:18px;
-  font-weight:bold;
-  text-align:center;
-}
-
-.chat{
-  height:80vh;
-  overflow-y:auto;
-  padding:15px;
-}
-
-.message{
-  max-width:70%;
-  padding:10px;
-  margin:5px 0;
-  border-radius:10px;
-  word-wrap:break-word;
-}
-
-.me{
-  background:#dcf8c6;
-  margin-left:auto;
-}
-
-.other{
+.topbar{
   background:white;
-  margin-right:auto;
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+  border-bottom:1px solid #ddd;
 }
 
-.input-area{
+.page{
+  display:none;
+  padding:15px;
+  height:75vh;
+  overflow-y:auto;
+}
+
+.active{
+  display:block;
+}
+
+.bottom{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:white;
   display:flex;
-  padding:10px;
-  background:#f0f0f0;
+  justify-content:space-around;
+  padding:10px 0;
+  border-top:1px solid #ddd;
 }
 
-input{
-  flex:1;
-  padding:10px;
-  border-radius:20px;
+.bottom button{
+  background:none;
   border:none;
-  outline:none;
-}
-
-button{
-  margin-left:10px;
-  padding:10px 20px;
-  border:none;
-  border-radius:20px;
-  background:#075E54;
-  color:white;
+  font-size:14px;
   cursor:pointer;
+}
+
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+}
+
+.post{
+  background:white;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:10px;
+}
+
+.story{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  border:3px solid #e1306c;
+  object-fit:cover;
 }
 </style>
 </head>
 <body>
 
-<div class="header">Instafatih Grup</div>
+<div class="topbar">Instafatih</div>
 
-<div class="chat" id="chat"></div>
+<!-- GÖNDERİ -->
+<div id="home" class="page active">
+  <h3>Gönderiler</h3>
+  <input type="file" id="postImage">
+  <textarea id="postText" placeholder="Ne düşünüyorsun?"></textarea>
+  <button onclick="addPost()">Paylaş</button>
+  <div id="posts"></div>
+</div>
 
-<div class="input-area">
-  <input type="text" id="messageInput" placeholder="Mesaj yaz...">
+<!-- HİKAYE -->
+<div id="storiesPage" class="page">
+  <h3>Hikayeler</h3>
+  <input type="file" id="storyImage">
+  <button onclick="addStory()">Hikaye Ekle</button>
+  <div id="stories"></div>
+</div>
+
+<!-- MESAJ -->
+<div id="chatPage" class="page">
+  <h3>Grup Mesaj</h3>
+  <div id="chatBox"></div>
+  <input type="text" id="chatInput" placeholder="Mesaj yaz">
   <button onclick="sendMessage()">Gönder</button>
+</div>
+
+<!-- PROFİL -->
+<div id="profilePage" class="page">
+  <h3>Profil</h3>
+  <p>Kullanıcı ID:</p>
+  <p id="uid"></p>
+</div>
+
+<div class="bottom">
+  <button onclick="show('home')">Gönderi</button>
+  <button onclick="show('storiesPage')">Hikaye</button>
+  <button onclick="show('chatPage')">Mesaj</button>
+  <button onclick="show('profilePage')">Profil</button>
 </div>
 
 <script>
@@ -89,53 +123,105 @@ const firebaseConfig = {
   apiKey: "BURAYA",
   authDomain: "BURAYA",
   projectId: "BURAYA",
+  storageBucket: "BURAYA"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+const storage = firebase.storage();
 
 let currentUser;
 
 auth.signInAnonymously().then(user=>{
   currentUser = user.user.uid;
+  document.getElementById("uid").innerText=currentUser;
 });
 
-function sendMessage(){
-  const text = document.getElementById("messageInput").value;
-  if(text.trim() === "") return;
+function show(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 
+/* POST */
+function addPost(){
+  const file=document.getElementById("postImage").files[0];
+  const text=document.getElementById("postText").value;
+  if(!file) return;
+
+  const ref=storage.ref("posts/"+Date.now());
+  ref.put(file).then(s=>{
+    s.ref.getDownloadURL().then(url=>{
+      db.collection("posts").add({
+        image:url,
+        text:text,
+        time:Date.now()
+      });
+    });
+  });
+}
+
+db.collection("posts").orderBy("time","desc")
+.onSnapshot(snap=>{
+  const div=document.getElementById("posts");
+  div.innerHTML="";
+  snap.forEach(doc=>{
+    const d=doc.data();
+    div.innerHTML+=`
+      <div class="post">
+        <img src="${d.image}" width="100%">
+        <p>${d.text}</p>
+      </div>
+    `;
+  });
+});
+
+/* STORY */
+function addStory(){
+  const file=document.getElementById("storyImage").files[0];
+  if(!file) return;
+
+  const ref=storage.ref("stories/"+Date.now());
+  ref.put(file).then(s=>{
+    s.ref.getDownloadURL().then(url=>{
+      db.collection("stories").add({
+        image:url,
+        time:Date.now()
+      });
+    });
+  });
+}
+
+db.collection("stories").orderBy("time","desc")
+.onSnapshot(snap=>{
+  const div=document.getElementById("stories");
+  div.innerHTML="";
+  snap.forEach(doc=>{
+    const d=doc.data();
+    div.innerHTML+=`<img class="story" src="${d.image}">`;
+  });
+});
+
+/* CHAT */
+function sendMessage(){
+  const text=document.getElementById("chatInput").value;
+  if(text==="") return;
   db.collection("messages").add({
     text:text,
     sender:currentUser,
     time:Date.now()
   });
-
-  document.getElementById("messageInput").value="";
+  document.getElementById("chatInput").value="";
 }
 
-db.collection("messages")
-.orderBy("time")
-.onSnapshot(snapshot=>{
-  const chat = document.getElementById("chat");
-  chat.innerHTML="";
-
-  snapshot.forEach(doc=>{
-    const data = doc.data();
-    const div = document.createElement("div");
-    div.classList.add("message");
-
-    if(data.sender === currentUser){
-      div.classList.add("me");
-    }else{
-      div.classList.add("other");
-    }
-
-    div.innerText = data.text;
-    chat.appendChild(div);
+db.collection("messages").orderBy("time")
+.onSnapshot(snap=>{
+  const div=document.getElementById("chatBox");
+  div.innerHTML="";
+  snap.forEach(doc=>{
+    const d=doc.data();
+    div.innerHTML+=`<p>${d.text}</p>`;
   });
-
-  chat.scrollTop = chat.scrollHeight;
 });
 </script>
 
