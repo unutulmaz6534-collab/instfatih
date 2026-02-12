@@ -2,228 +2,165 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Instafatih</title>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
 
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
   background:#fafafa;
 }
 
+/* TOP BAR */
 .topbar{
-  background:white;
-  padding:15px;
-  text-align:center;
-  font-weight:bold;
-  border-bottom:1px solid #ddd;
-}
-
-.page{
-  display:none;
-  padding:15px;
-  height:75vh;
-  overflow-y:auto;
-}
-
-.active{
-  display:block;
-}
-
-.bottom{
   position:fixed;
-  bottom:0;
+  top:0;
   width:100%;
+  height:55px;
   background:white;
   display:flex;
-  justify-content:space-around;
-  padding:10px 0;
-  border-top:1px solid #ddd;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 15px;
+  border-bottom:1px solid #dbdbdb;
+  font-weight:bold;
 }
 
-.bottom button{
-  background:none;
-  border:none;
-  font-size:14px;
+.logo{
+  font-size:20px;
+}
+
+.icon{
+  font-size:22px;
   cursor:pointer;
 }
 
-input, textarea{
-  width:100%;
+/* STORY BAR */
+.story-bar{
+  margin-top:55px;
+  background:white;
+  display:flex;
+  overflow-x:auto;
   padding:10px;
-  margin-top:10px;
+  border-bottom:1px solid #dbdbdb;
+}
+
+.story{
+  margin-right:15px;
+  text-align:center;
+}
+
+.story img{
+  width:65px;
+  height:65px;
+  border-radius:50%;
+  padding:2px;
+  background:linear-gradient(45deg,#feda75,#d62976,#962fbf);
+  object-fit:cover;
+}
+
+/* POST */
+.feed{
+  padding-bottom:60px;
 }
 
 .post{
   background:white;
-  padding:10px;
   margin-bottom:10px;
-  border-radius:10px;
+  border-top:1px solid #dbdbdb;
+  border-bottom:1px solid #dbdbdb;
 }
 
-.story{
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  border:3px solid #e1306c;
-  object-fit:cover;
+.post-header{
+  padding:10px;
+  font-weight:bold;
+}
+
+.post img{
+  width:100%;
+}
+
+.post-actions{
+  padding:10px;
+  font-size:20px;
+}
+
+.post-text{
+  padding:0 10px 10px;
+}
+
+/* BOTTOM NAV */
+.bottom{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  height:55px;
+  background:white;
+  border-top:1px solid #dbdbdb;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+}
+
+.bottom div{
+  font-size:22px;
+  cursor:pointer;
 }
 </style>
 </head>
+
 <body>
 
-<div class="topbar">Instafatih</div>
-
-<!-- GÖNDERİ -->
-<div id="home" class="page active">
-  <h3>Gönderiler</h3>
-  <input type="file" id="postImage">
-  <textarea id="postText" placeholder="Ne düşünüyorsun?"></textarea>
-  <button onclick="addPost()">Paylaş</button>
-  <div id="posts"></div>
+<!-- TOP -->
+<div class="topbar">
+  <div class="logo">instafatih</div>
+  <div class="icon">✉️</div>
 </div>
 
-<!-- HİKAYE -->
-<div id="storiesPage" class="page">
-  <h3>Hikayeler</h3>
-  <input type="file" id="storyImage">
-  <button onclick="addStory()">Hikaye Ekle</button>
-  <div id="stories"></div>
+<!-- STORIES -->
+<div class="story-bar">
+  <div class="story">
+    <img src="https://picsum.photos/200?1">
+    <div>Sen</div>
+  </div>
+  <div class="story">
+    <img src="https://picsum.photos/200?2">
+    <div>Ali</div>
+  </div>
+  <div class="story">
+    <img src="https://picsum.photos/200?3">
+    <div>Veli</div>
+  </div>
 </div>
 
-<!-- MESAJ -->
-<div id="chatPage" class="page">
-  <h3>Grup Mesaj</h3>
-  <div id="chatBox"></div>
-  <input type="text" id="chatInput" placeholder="Mesaj yaz">
-  <button onclick="sendMessage()">Gönder</button>
+<!-- FEED -->
+<div class="feed">
+
+  <div class="post">
+    <div class="post-header">ali_user</div>
+    <img src="https://picsum.photos/500?4">
+    <div class="post-actions">❤️ 💬 📤</div>
+    <div class="post-text">Güzel bir gün ☀️</div>
+  </div>
+
+  <div class="post">
+    <div class="post-header">veli_user</div>
+    <img src="https://picsum.photos/500?5">
+    <div class="post-actions">❤️ 💬 📤</div>
+    <div class="post-text">Instafatih yakında 🔥</div>
+  </div>
+
 </div>
 
-<!-- PROFİL -->
-<div id="profilePage" class="page">
-  <h3>Profil</h3>
-  <p>Kullanıcı ID:</p>
-  <p id="uid"></p>
-</div>
-
+<!-- BOTTOM NAV -->
 <div class="bottom">
-  <button onclick="show('home')">Gönderi</button>
-  <button onclick="show('storiesPage')">Hikaye</button>
-  <button onclick="show('chatPage')">Mesaj</button>
-  <button onclick="show('profilePage')">Profil</button>
+  <div>🏠</div>
+  <div>🔍</div>
+  <div>➕</div>
+  <div>❤️</div>
+  <div>👤</div>
 </div>
-
-<script>
-const firebaseConfig = {
-  apiKey: "BURAYA",
-  authDomain: "BURAYA",
-  projectId: "BURAYA",
-  storageBucket: "BURAYA"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
-const storage = firebase.storage();
-
-let currentUser;
-
-auth.signInAnonymously().then(user=>{
-  currentUser = user.user.uid;
-  document.getElementById("uid").innerText=currentUser;
-});
-
-function show(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-
-/* POST */
-function addPost(){
-  const file=document.getElementById("postImage").files[0];
-  const text=document.getElementById("postText").value;
-  if(!file) return;
-
-  const ref=storage.ref("posts/"+Date.now());
-  ref.put(file).then(s=>{
-    s.ref.getDownloadURL().then(url=>{
-      db.collection("posts").add({
-        image:url,
-        text:text,
-        time:Date.now()
-      });
-    });
-  });
-}
-
-db.collection("posts").orderBy("time","desc")
-.onSnapshot(snap=>{
-  const div=document.getElementById("posts");
-  div.innerHTML="";
-  snap.forEach(doc=>{
-    const d=doc.data();
-    div.innerHTML+=`
-      <div class="post">
-        <img src="${d.image}" width="100%">
-        <p>${d.text}</p>
-      </div>
-    `;
-  });
-});
-
-/* STORY */
-function addStory(){
-  const file=document.getElementById("storyImage").files[0];
-  if(!file) return;
-
-  const ref=storage.ref("stories/"+Date.now());
-  ref.put(file).then(s=>{
-    s.ref.getDownloadURL().then(url=>{
-      db.collection("stories").add({
-        image:url,
-        time:Date.now()
-      });
-    });
-  });
-}
-
-db.collection("stories").orderBy("time","desc")
-.onSnapshot(snap=>{
-  const div=document.getElementById("stories");
-  div.innerHTML="";
-  snap.forEach(doc=>{
-    const d=doc.data();
-    div.innerHTML+=`<img class="story" src="${d.image}">`;
-  });
-});
-
-/* CHAT */
-function sendMessage(){
-  const text=document.getElementById("chatInput").value;
-  if(text==="") return;
-  db.collection("messages").add({
-    text:text,
-    sender:currentUser,
-    time:Date.now()
-  });
-  document.getElementById("chatInput").value="";
-}
-
-db.collection("messages").orderBy("time")
-.onSnapshot(snap=>{
-  const div=document.getElementById("chatBox");
-  div.innerHTML="";
-  snap.forEach(doc=>{
-    const d=doc.data();
-    div.innerHTML+=`<p>${d.text}</p>`;
-  });
-});
-</script>
 
 </body>
 </html>
